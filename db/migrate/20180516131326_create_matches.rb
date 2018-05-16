@@ -8,6 +8,8 @@ class CreateMatches < ActiveRecord::Migration[5.1]
       t.time :ora
       t.float :lat
       t.float :long
+      t.belongs_to :creatore, index: true
+      t.integer :tipo
 
       t.timestamps
     end
