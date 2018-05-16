@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  nome: MyString
+  cognome: MyString
+  img: 
+  desc: MyString
+  nick: MyString
+  ruolo1: MyString
+  ruolo2: MyString
+  voto: 1.5
+
+two:
+  nome: MyString
+  cognome: MyString
+  img: 
+  desc: MyString
+  nick: MyString
+  ruolo1: MyString
+  ruolo2: MyString
+  voto: 1.5
