@@ -1,0 +1,9 @@
+class AddOAuthUs < ActiveRecord::Migration[5.1]
+  def change
+  	change_table :users do |t|
+  		t.remove :token
+  	end
+
+  	add_column :users, :provider, :string
+  end
+end
