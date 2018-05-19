@@ -1,0 +1,84 @@
+h3 {
+	background-image: url(/assets/black.png);
+	text-align: center;
+}
+
+#left p{
+  position: absolute;
+  top:150px;
+  left: 150px;
+
+}
+
+#left button{
+  background: blue;
+  position: absolute;
+  top:250px;
+  left: 130px;
+  color: white;
+  border-radius: 5px;
+  width: 200px;
+  height: 30px;
+
+}
+
+#left h4{
+  position: absolute;
+  top:330px;
+  left: 90px;
+}
+
+#right p{
+  position: absolute;
+  top:90px;
+  right: 150px;
+}
+
+#right h5{
+  position: absolute;
+  top:110px;
+  right: 100px;
+
+}
+
+#right h6{
+  position: absolute;
+  top:150px;
+  right: 110px;
+
+}
+
+#right input[type = text]{
+  height: 20px;
+  width: 190px;
+  border-radius: 10px;
+}
+
+label{
+  font-size: 18px;
+}
+
+.button{
+  background: black;
+  position: absolute;
+  top:150px;
+  right: 0px;
+  color: white;
+  border-radius: 5px;
+  width: 200px;
+  height: 30px;
+}
+
+.button1{
+  background: blue;
+  position: absolute;
+  top:450px;
+  font-size: 14px;
+  right: 50px;
+  color: white;
+  border-radius: 5px;
+  width: 300px;
+  height: 30px;  
+}
+
+

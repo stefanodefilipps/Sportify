@@ -34,8 +34,13 @@ gem 'jbuilder', '~> 2.5'
 # gem 'capistrano-rails', group: :development
 gem 'omniauth'
 gem 'devise'
-gem 'omniauth-facebook'
+gem 'omniauth-facebook','~> 4.0.0' #altrimenti non funziona la callback di facebook
 gem 'koala'
+gem "haml-rails", "~> 1.0"
+gem 'bootstrap', '~> 4.1.1'
+gem 'jquery-rails'
+gem 'popper_js', '~> 1.11', '>= 1.11.1'
+
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

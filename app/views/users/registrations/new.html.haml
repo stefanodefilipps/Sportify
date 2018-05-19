@@ -1,0 +1,37 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title
+  %body
+    .container
+      = form_tag("/users", method: "post") do
+        .form-group.row
+          = label_tag(:nick,"Nickname", class: "col-sm-2 col-form-label")
+          .col-sm-10
+            = text_field_tag(:nick, "nickname", class:"form-control")
+        .form-group.row
+          .col-sm-2 Ruoli
+          .col-sm-2
+            .form-check-inline
+              = check_box_tag(:p, class: "form-check-input") 
+              = label_tag(:p, "P", class: "form-check-label") 
+          .col-sm-2
+            .form-check-inline
+              = check_box_tag(:d,class: "form-check-input") 
+              = label_tag(:d, "D",class: "form-check-label") 
+          .col-sm-2
+            .form-check-inline
+              = check_box_tag(:c1, class: "form-check-input") 
+              = label_tag(:c1, "C1", class: "form-check-label") 
+          .col-sm-2
+            .form-check-inline
+              = check_box_tag(:c2, class: "form-check-input") 
+              = label_tag(:c2, "C2", class: "form-check-label") 
+          .col-sm-2
+            .form-check-inline
+              = check_box_tag(:a, class: "form-check-input") 
+              = label_tag(:a, "A", class: "form-check-label") 
+        .form-group.row
+          .col-sm-2
+            = submit_tag("Salva", class: "btn btn-primary")  

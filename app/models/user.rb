@@ -10,14 +10,20 @@ class User < ApplicationRecord
 
 	 # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-	devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable,
-         :omniauthable, :omniauth_providers => [:facebook]
+	devise :omniauthable, :omniauth_providers => [:facebook]
+
+	#la funzione seguente serve per trovare un utente che ha ia fatto il login con facebbok o a crearne uno con le credenziali minime
+	#se non trovato allora ne creo uno in cui ci salvo l'auth.provider e l'auth.uid
+	#l'email in realtà non mi serve e sara da togliere
+	#devo anche prendermi il nome, il cognome e l'immagine da salvare nel database
+	#inoltre devo prendermi anche il token di facebook dato al momento dell'autenticazione perchè mi serve in caso di voler fare il log-out
 
 	def self.from_omniauth(auth) 
 		where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
-			user.email = auth.info.email
-			user.password = Devise.friendly_token[0,20]
+			user.token = auth.credentials.token
+			user.nome = auth.info.first_name
+			user.cognome = auth.info.last_name
+			user.img = auth.info.image
 		end
 	end
 
@@ -28,4 +34,9 @@ class User < ApplicationRecord
 	      	end
     	end
 	end
+
+	def just_created()
+		desc == nil && nick == nil && ruolo1 == nil && ruolo2 == nil
+	end
+
 end
