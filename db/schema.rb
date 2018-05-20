@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180519085913) do
+ActiveRecord::Schema.define(version: 20180520174733) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 20180519085913) do
     t.date "data"
     t.time "ora"
     t.float "lat"
-    t.float "long"
+    t.float "lng"
     t.bigint "creatore_id"
     t.integer "tipo"
     t.datetime "created_at", null: false

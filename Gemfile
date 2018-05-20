@@ -40,6 +40,8 @@ gem "haml-rails", "~> 1.0"
 gem 'bootstrap', '~> 4.1.1'
 gem 'jquery-rails'
 gem 'popper_js', '~> 1.11', '>= 1.11.1'
+gem 'httparty'
+gem 'geokit-rails'
 
 
 group :development, :test do

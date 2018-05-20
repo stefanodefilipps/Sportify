@@ -1,4 +1,7 @@
 class ApplicationController < ActionController::Base
+
+  #rails server -b 'ssl://localhost:3000?key=/home/biar/Desktop/localhost.key&cert=/home/biar/Desktop/localhost.crt'
+
   protect_from_forgery with: :exception
 
    helper_method :current_user, :logged_in?

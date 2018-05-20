@@ -29,8 +29,12 @@ class UsersController < ApplicationController
 		session["uid"] = nil
 		session["user_id"] = @user_id
 		@user.nick = par["nick"]
-		@user.ruolo1 = par["ruolo1"][0]
-		@user.ruolo2 = par["ruolo1"][1]
+		if par["ruolo1"].length == 1
+			@user.ruolo1 = par["ruolo1"][0]
+		else
+			@user.ruolo1 = par["ruolo1"][0]
+			@user.ruolo2 = par["ruolo1"][1]
+		end
 		if @user.save
 			puts "Nuovo utente creato"
 			redirect_to root_path

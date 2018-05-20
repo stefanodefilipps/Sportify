@@ -11,6 +11,7 @@ class User < ApplicationRecord
 	 # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
 	devise :omniauthable, :omniauth_providers => [:facebook]
+	
 
 	#la funzione seguente serve per trovare un utente che ha ia fatto il login con facebbok o a crearne uno con le credenziali minime
 	#se non trovato allora ne creo uno in cui ci salvo l'auth.provider e l'auth.uid
