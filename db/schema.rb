@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180520174733) do
+ActiveRecord::Schema.define(version: 20180521200303) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -89,17 +89,6 @@ ActiveRecord::Schema.define(version: 20180520174733) do
     t.index ["match_id"], name: "index_pts_on_match_id"
   end
 
-  create_table "s", force: :cascade do |t|
-    t.string "ruolo"
-    t.bigint "pt_id"
-    t.bigint "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["pt_id"], name: "index_s_on_pt_id"
-    t.index ["ruolo", "pt_id"], name: "index_s_on_ruolo_and_pt_id", unique: true
-    t.index ["user_id"], name: "index_s_on_user_id"
-  end
-
   create_table "sqs", force: :cascade do |t|
     t.bigint "notificatio_id"
     t.bigint "team_id"
@@ -107,6 +96,17 @@ ActiveRecord::Schema.define(version: 20180520174733) do
     t.datetime "updated_at", null: false
     t.index ["notificatio_id"], name: "index_sqs_on_notificatio_id"
     t.index ["team_id"], name: "index_sqs_on_team_id"
+  end
+
+  create_table "squadras", force: :cascade do |t|
+    t.string "ruolo"
+    t.bigint "pt_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pt_id"], name: "index_squadras_on_pt_id"
+    t.index ["ruolo", "pt_id"], name: "index_squadras_on_ruolo_and_pt_id", unique: true
+    t.index ["user_id"], name: "index_squadras_on_user_id"
   end
 
   create_table "teams", force: :cascade do |t|

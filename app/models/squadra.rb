@@ -1,4 +1,4 @@
-class S < ApplicationRecord
+class Squadra < ApplicationRecord
 	belongs_to :pt 
 	belongs_to :user
 end
