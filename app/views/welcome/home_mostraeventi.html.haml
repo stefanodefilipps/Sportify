@@ -1,0 +1,80 @@
+!!!
+%html
+  %head
+    %title mostraeventi
+    = stylesheet_link_tag "mostraeventi"
+  %body
+    %ul#menu
+      %input#search{:name => "cerca", :placeholder => "Cerca partita...", :type => "text"}/
+      %li
+        %a{:href => "#"} Profilo
+      %li
+        %a{:href => "#"} Play
+      %li
+        %a{:href => "#"} Home
+    #bar
+      = image_tag("black.png",id: "image", align: "center", height: "130", width:130)
+      %br/
+      %br/
+      %br/
+      %p
+        %b Nickname:
+      %br/
+      %p
+        %b Valutazione:
+      %br/
+      %a{:href => "#"}
+        %b Teams
+      %br/
+      %br/
+      %br/
+      %a{:href => "#"}
+        %b Logout
+    #container
+      %br/
+      %b Incoming
+      %br/
+      #result
+        %button#setscore Set score
+        %input#set{:min => "0", :step => "1", :type => "number"}/
+        %input#set{:min => "0", :step => "1", :type => "number"}/
+      #left
+        %input#P{:name => "giocatore1", :readonly => "readonly", :type => "text"}/
+        %br/
+        %br/
+        %input#D{:name => "giocatore2", :readonly => "readonly", :type => "text"}/
+        %br/
+        %br/
+        %input#C1{:name => "giocatore3", :readonly => "readonly", :type => "text"}/
+        %br/
+        %br/
+        %input#C2{:name => "giocatore4", :readonly => "readonly", :type => "text"}/
+        %br/
+        %br/
+        %input#A{:name => "giocatore5", :readonly => "readonly", :type => "text"}/
+      #right
+        %input#P{:name => "giocatore1", :readonly => "readonly", :type => "text"}/
+        %br/
+        %br/
+        %input#D{:name => "giocatore2", :readonly => "readonly", :type => "text"}/
+        %br/
+        %br/
+        %input#C1{:name => "giocatore3", :readonly => "readonly", :type => "text"}/
+        %br/
+        %br/
+        %input#C2{:name => "giocatore4", :readonly => "readonly", :type => "text"}/
+        %br/
+        %br/
+        %input#A{:name => "giocatore5", :readonly => "readonly", :type => "text"}/
+      #bottom
+        Data, Ora, Luogo:
+        %br/
+        %input#data{:name => "data", :readonly => "readonly", :type => "text"}/
+        %input#ora{:name => "ora", :readonly => "readonly", :type => "text"}/
+        %input#luogo{:name => "luogo", :readonly => "readonly", :type => "text"}/
+        %button#impostazioni Imp
+      #action
+        %button#google Google
+        %br/
+        %br/
+        %button#logout Logout

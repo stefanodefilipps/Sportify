@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180521200303) do
+ActiveRecord::Schema.define(version: 20180522095406) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -89,6 +89,13 @@ ActiveRecord::Schema.define(version: 20180521200303) do
     t.index ["match_id"], name: "index_pts_on_match_id"
   end
 
+  create_table "pts_teams", id: false, force: :cascade do |t|
+    t.bigint "pt_id"
+    t.bigint "team_id"
+    t.index ["pt_id"], name: "index_pts_teams_on_pt_id"
+    t.index ["team_id"], name: "index_pts_teams_on_team_id"
+  end
+
   create_table "sqs", force: :cascade do |t|
     t.bigint "notificatio_id"
     t.bigint "team_id"
@@ -115,6 +122,13 @@ ActiveRecord::Schema.define(version: 20180521200303) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["capitano_id"], name: "index_teams_on_capitano_id"
+  end
+
+  create_table "teams_tts", id: false, force: :cascade do |t|
+    t.bigint "tt_id"
+    t.bigint "team_id"
+    t.index ["team_id"], name: "index_teams_tts_on_team_id"
+    t.index ["tt_id"], name: "index_teams_tts_on_tt_id"
   end
 
   create_table "tts", force: :cascade do |t|

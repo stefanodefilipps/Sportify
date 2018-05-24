@@ -1,5 +1,35 @@
-%h1 Welcome#home
-%p Find me in app/views/welcome/home.html.erb
-
-= link_to "Sign in with Facebook", user_facebook_omniauth_authorize_path 
-= link_to "Log-out", logout_path, method: :delete 
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title home
+    = stylesheet_link_tag "home.css"
+    %script{:src => "https://code.jquery.com/jquery-3.2.1.min.js"}
+  %body{:body => "", :style => "background-color:black"}
+    %ul#menu
+      = image_tag("sportify.png",height: '50', width: '120')
+      %li
+        %a{:href => "#"} [about]
+      %li
+        %a{:href => "#"} [stats]
+      %li
+        %a{:href => "#"} [faq]
+      %li
+        %a{:href => "#"} [hall of fame]
+    #container
+      #image.row.align-items-center
+        .col
+        .col
+          = image_tag("sportify.png",height: '90', width: '220')
+        .col
+      #form.row.align-items-center
+        .col
+        .col
+          %form
+            #center.row.align-items-center
+              .col
+              .col
+                %input#inputtext.form-input{:placeholder => "Cerca partita...", :type => "text"}/
+              .col
+                %button.btn.btn-primary.mb-2{:type => "submit"} Cerca
+        .col

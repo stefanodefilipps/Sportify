@@ -2,36 +2,51 @@
 %html
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title
+    %title Iscriviti
+    = stylesheet_link_tag "iscriviti.css"
   %body
-    .container
-      = form_for(@user) do |f|
-        .form-group.row
-          = f.label(:nick,"Nickname", class: "col-sm-2 col-form-label")
-          .col-sm-10
-            = f.text_field(:nick, class:"form-control")
-        .form-group.row
-          .col-sm-2 Ruoli
-          .col-sm-2
-            .form-check-inline
-              = f.check_box(:ruolo1, {multiple: true, class: "form-check-input"}, "P", nil) 
-              = f.label(:p, "P", class: "form-check-label") 
-          .col-sm-2
-            .form-check-inline
-              = f.check_box(:ruolo1, {multiple: true, class: "form-check-input"}, "D", nil) 
-              = f.label(:d, "D",class: "form-check-label") 
-          .col-sm-2
-            .form-check-inline
-              = f.check_box(:ruolo1, {multiple: true, class: "form-check-input"}, "C1", nil) 
-              = f.label(:c1, "C1", class: "form-check-label") 
-          .col-sm-2
-            .form-check-inline
-              = f.check_box(:ruolo1, {multiple: true, class: "form-check-input"}, "C2", nil) 
-              = f.label(:c2, "C2", class: "form-check-label") 
-          .col-sm-2
-            .form-check-inline
-              = f.check_box(:ruolo1, {multiple: true, class: "form-check-input"}, "A", nil) 
-              = f.label(:a, "A", class: "form-check-label") 
-        .form-group.row
-          .col-sm-2
-            = f.submit("Salva", class: "btn btn-primary")  
+    #intestazione
+      .container
+        .row
+          .col-sm
+          .col-sm
+            = image_tag("sportify.png",height: '70', width: '220',id: "sporty")
+          .col-sm
+    #left
+      %p
+        %b Sei un utente registrato?
+      %button#butt.btn.btn-primary{:type => "button"}
+        %b Accedi usando Facebook
+      = image_tag("futsal",height: '210', width: '300',id: "image")
+    #right
+      %p
+        %b Iscriviti a Sportify
+      #sub Partecipa agli eventi sportivi nella tua zona
+      #formok
+        %form
+          .form-group
+            %input#InputNick.form-control{:placeholder => "Enter Nickname", :type => "text"}/
+          .form-group
+          .form-group.form-check
+            %label
+              %b Selezione dei ruoli:
+            %br/
+            %input#P.form-check-input{:type => "checkbox"}/
+            %label.form-check-label{:for => "P"} P
+            %br/
+            %input#D.form-check-input{:type => "checkbox"}/
+            %label.form-check-label{:for => "D"} D
+            %br/
+            %input#C1.form-check-input{:type => "checkbox"}/
+            %label.form-check-label{:for => "C1"} C1
+            %br/
+            %input#C2.form-check-input{:type => "checkbox"}/
+            %label.form-check-label{:for => "C2"} C2
+            %br/
+            %input#A.form-check-input{:type => "checkbox"}/
+            %label.form-check-label{:for => "A"} A
+            %br/
+          %button#savebutt.btn.btn-dark{:type => "submit"} Salva Informazioni
+      #accedibutt
+        %button#button1.btn.btn-primary
+          %b Accedi con Facebook per iscriverti

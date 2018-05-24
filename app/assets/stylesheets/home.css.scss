@@ -1,41 +1,45 @@
 #menu ul {
-width:1000px; /* Dimensioni della barra del menu */
-padding:0;
-margin:0 auto;
-display:inline;
-list-style-type:none; /* Stile della lista */
+    width:1000px; /* Dimensioni della barra del menu */
+    padding:0;
+    margin:0 auto;
+    display:inline;
+
 }
 
 #menu li {
-display:inline;
+    display:inline;
 }
 
 #menu a {
-color:#fff; /* Colore del testo */
-text-align:right; /* Testo allineato al centro */
-text-decoration:none; /* Nessuna decorazione */
-background:black; /* Colore dello sfondo */
-padding:4px 50px; /* Distanza tra le singole voci */
-border-right:110px solid black;
+    color:#fff; /* Colore del testo */
+    text-align:right; /* Testo allineato al centro */
+    text-decoration:none; /* Nessuna decorazione */
+    background:black; /* Colore dello sfondo */
+    padding:4px 50px; /* Distanza tra le singole voci */
+    border-right:110px solid black;
 }
 
-h1 {
-  	margin: 0px;
-  	background-image: url('/home/biar/Desktop/Lab/campo.jpg');
-  	background-repeat: no-repeat;
-  	background-size: 1250px 800px;
-  	color: #FFFFFF;
-  	background-color: black;
-  	font-size: 140%;
-  	font-weight: normal; 
-  	line-height: 600px;
-  	text-align: center;
- 	  width: 1250px;        
+#image{
+    position: absolute;
+    top: 250px;
+    left: 500px;
 }
 
-h2{
- 	position: absolute;
- 	top: 250px;
- 	left:560px;
+#form{
+    position: absolute;
+    top: 380px;
+    left:400px;
 }
 
+#inputtext{
+  width: 300px;
+  border-radius: 10px;
+}
+
+#container{
+  min-height: 700px;
+  max-width: 1450px;
+  background-image: image_url('campo.jpg');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}

@@ -1,0 +1,21 @@
+= form_tag "/users/#{@user.id}/teams", method: "post" do
+  .form-group
+    = label_tag :nome, "Nome della squadra"
+    = text_field_tag "nome",nil, class: "form-control", placeholder: "Nome della squadra", autofocus: true
+  .form-group
+    = label_tag :Portiere, "Inserisci un portiere"
+    = text_field_tag "P",nil, class: "form-control", placeholder: "Nickname del portiere", autofocus: true
+  .form-group
+    = label_tag :Attaccatnte, "Inserisci attaccante"
+    = text_field_tag "A",nil, class: "form-control", placeholder: "Nickname Attaccante", autofocus: true
+  .form-group
+    = label_tag :C1, "Inserisci centro campista 1"
+    = text_field_tag "C1",nil, class: "form-control", placeholder: "Nickname centro campista 1", autofocus: true
+  .form-group
+    = label_tag :C2, "Inserisci centro campista 2"
+    = text_field_tag "C2",nil, class: "form-control", placeholder: "Nickname centro campista 2", autofocus: true
+  .form-group
+    = label_tag :D, "Inserisci difensore"
+    = text_field_tag "D",nil, class: "form-control", placeholder: "Nickname del difensore", autofocus: true
+  .form-group
+    = submit_tag "crea squadra", class: "btn btn-primary mb-2"

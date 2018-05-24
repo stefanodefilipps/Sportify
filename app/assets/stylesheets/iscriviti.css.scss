@@ -1,7 +1,11 @@
-h3 {
-	background-image: url(/assets/black.png);
-	text-align: center;
+#intestazione {
+  background-image: image_url('black.png');
+  min-height: 70px;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
+
 
 #left p{
   position: absolute;
@@ -10,19 +14,13 @@ h3 {
 
 }
 
-#left button{
-  background: blue;
+#butt{
   position: absolute;
   top:250px;
   left: 130px;
-  color: white;
-  border-radius: 5px;
-  width: 200px;
-  height: 30px;
-
 }
 
-#left h4{
+#image{
   position: absolute;
   top:330px;
   left: 90px;
@@ -31,54 +29,44 @@ h3 {
 #right p{
   position: absolute;
   top:90px;
-  right: 150px;
+  right: 190px;
 }
 
-#right h5{
+
+#sub{
   position: absolute;
   top:110px;
   right: 100px;
-
 }
 
-#right h6{
+
+
+#formok{
   position: absolute;
   top:150px;
-  right: 110px;
+  right: 140px;
 
 }
 
-#right input[type = text]{
+#InputNick{
   height: 20px;
-  width: 190px;
+  width: 250px;
   border-radius: 10px;
+  border-color: black;
 }
 
-label{
-  font-size: 18px;
-}
 
-.button{
-  background: black;
+#savebutt{
   position: absolute;
-  top:150px;
-  right: 0px;
-  color: white;
-  border-radius: 5px;
-  width: 200px;
-  height: 30px;
+  top:200px;
+  right: 30px;
 }
 
-.button1{
-  background: blue;
+#accedibutt{
   position: absolute;
   top:450px;
-  font-size: 14px;
-  right: 50px;
-  color: white;
-  border-radius: 5px;
-  width: 300px;
-  height: 30px;  
+  right:100px;
+ 
 }
 
 

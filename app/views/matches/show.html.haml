@@ -1,0 +1,42 @@
+- if @m.tipo == 1
+	- @players.each do |p|
+		%ul
+			%ul
+				%li 
+					= p.ruolo
+				%li 
+					= p.user.nick
+- if @m.tipo == 2
+	- @single_players.each do |sp|
+		%ul
+			%ul
+				%li 
+					= p.ruolo
+				%li 
+					= p.user.nick
+	- if @m.pt.team != nil
+		SQUADRA
+		= m.pt.team.nome
+		- @team_players.each do |sp|
+			%ul
+				%ul
+					%li 
+						= p.ruolo
+					%li 
+						= p.user.nick
+- if @m.tipo == 3
+	- @players_team_1.each do |p|
+		%ul
+			%ul
+				%li 
+					= p.ruolo
+				%li 
+					= p.user.nick
+	- if @m.tt.team.size == 2
+		- @players_team_2.each do |p|
+			%ul
+				%ul
+					%li 
+						= p.ruolo
+					%li 
+						= p.user.nick

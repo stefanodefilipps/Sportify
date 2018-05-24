@@ -1,5 +1,76 @@
 class MatchesController < ApplicationController
 
+	#Questa action permette di vedere in dettaglio la partita distinta da id_match definito nella url. Prima controllo che 
+	#lo user partecipi effettivamente al match, altrimenti lo rimando su root. Se il test viene verificato allora:
+	#-Se la partita è pp mi prendo la collezione dei gioca associati a quella partita così da avere tutti gli utenti che 
+	#partecipano alla partita e anche i ruoli da poter far vedere
+	#-Se la partita è pt mi prendo la collezione dei squadra associata a quella partita così da avere tutti gli utenti singoli che 
+	#partecipano a quella partita. Inoltre se è stata assegnata una squadra a pt, allora dalla squadra mi prendo tutti i membro 
+	#di quella squadra codì da poter risalire velocemente agli user di quella squadra che partecipano alla partita con i ruoli
+	#definiti dalla loro appartenenza alla squadra
+	#-Se la partita è tt, allora controllo se ho entrambe le squadre e di ogni squadra mi prendo le relazioni membro così da avere
+	#i giocatori che partecipano alla partita con i loro rispettivi ruoli che coincidono con quelli della loro associazione con
+	#la squadra di appartenenza
+
+	def show
+		user = User.find_by id: params[:user_id]
+		@m = Match.find_by id: params[:id]
+		matches = find_all_matches(user)
+		if matches.count{|ma| ma.id == @m.id} == 0
+			puts "User non partecipa a questa partita"
+			redirect_to root_path
+		end
+		if @m.tipo == 1
+			@players = @m.pp.gioca
+		elsif @m.tipo == 2
+			@single_players = @m.pt.squadra
+			if m.pt.team != nil
+				@team_players = @m.pt.team.membro
+			end
+		elsif @m.tipo == 3
+			if m.tt.team.size == 1
+				@players_team_1 = @m.tt.team[0].membro
+			else
+				@players_team_1 = @m.tt.team[0].membro
+				@players_team_2 = @m.tt.team[1].membro
+			end
+		end
+			
+			
+	end
+
+	#Con questo metodo restituisco tutti i match in cui un giocatore è presente o come utente singolo o come componente di una
+	#squadra. Restituisco un array di oggetti Match da cui posso poi risalire a tutti i vari componenti utili di un match se 
+	#devo mostrare informazioni aggiuntive
+	#dalla url mi estraggo l'id dell'user e lo trovo nel database. In seguito mi trovvo prima tutti i pp a cui partecipa e 
+	#da questi mi prendo i match a cui si riferiscono. Dopo prendo tutti i pt a cui partecipa come utente singolo e mi prendo
+	#il match corrispondente. In seguito mi prendo tutti i team a cui partecipa. Per ogni team mi prendo tutti i pt a cui partecipa 
+	#e i match in cui è stata inserita la squadra e quindi i match pt a cui partecipa l'user tramite la squadra. Di ogni squadra
+	#mi prendo anche i tt a cui partecipa e quindi il match corrispondente a cui partecipa l'utente che partecipa a quella squadra
+
+	def index
+		user = User.find_by id: params[:user_id]
+		puts user
+		matches_pp = user.pp
+		matches_pt_s = user.pt
+		user_teams = user.team
+		@matches = Array.new
+		matches_pp.each do |p|
+			@matches.push p.match
+		end
+		matches_pt_s.each do |p|
+			@matches.push p.match
+		end
+		user_teams.each do |t|
+			t.pt.each do |p|
+				@matches.push p.match
+			end
+			t.tt.each do |tt|
+				@matches.push tt.match
+			end
+		end
+	end
+
 	#mi arriva la get a questa route e in params ho location che viene mandata come query
 	#chiamo find cordinates e mi trovo lat e lng che viene passato come un array di due elementi se tutto andato bene
 	#faccio una query sul modello Match per fare in modo di trovare solo le partite che sono nel raggio di quelle coordinate
@@ -24,8 +95,8 @@ class MatchesController < ApplicationController
 			redirect_to root_path
 		else
 			@matches_pp = Match.within(5, :origin => coordinates).joins(pp: :gioca).group("pps.id,matches.id").having("count(pps.id) < 10").select("pps.*, matches.*")
-			@matches_pt = Match.within(5, :origin => coordinates).joins(pt: :squadra).group("pts.id,matches.id").having("count(pts.id) < 6").select("pts.*, matches.*")
-			@matches_tt = Match.within(5, :origin => coordinates).joins(:tt).group("tts.id,matches.id").having("count(tts.id) < 2").select("tts.*, matches.*")
+			@matches_pt = Match.within(5, :origin => coordinates).joins(pt: [:squadra, :team]).group("pts.id,matches.id").having("count(pts.id) < 6").select("pts.*, matches.*")
+			@matches_tt = Match.within(5, :origin => coordinates).joins(tt: :team).group("tts.id,matches.id").having("count(tts.id) < 2").select("tts.*, matches.*")
 			@roles_left_pp = Hash.new
 			@matches_pp.each do |m_pp|
 				@roles_left_pp["#{m_pp.id}"] = find_roles_left(m_pp,"pp")
@@ -72,11 +143,36 @@ class MatchesController < ApplicationController
 			return roles
 		end
 		if type == 'pt'
-			roles = ["A","P","C","C","D"]
+			roles = ["A","P","C1","C2","D"]
 			match.pt.squadra.each do |g|
 				roles.delete(g.ruolo)
 			end
 			return roles
 		end
+	end
+
+	#Questa funzione serve per trovare tutti i match associati a un utente che ho gia trovato nel database con find_by. Molto
+	#simile alla funzione svolta all'interno dell'azione index del medesimo controller
+
+	def find_all_matches(user)
+		matches_pp = user.pp
+		matches_pt_s = user.pt
+		user_teams = user.team
+		matches = Array.new
+		matches_pp.each do |p|
+			matches.push p.match
+		end
+		matches_pt_s.each do |p|
+			matches.push p.match
+		end
+		user_teams.each do |t|
+			t.pt.each do |p|
+				matches.push p.match
+			end
+			t.tt.each do |tt|
+				matches.push tt.match
+			end
+		end
+		return matches
 	end
 end
