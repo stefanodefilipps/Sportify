@@ -13,6 +13,14 @@
 //= require rails-ujs
 //= require turbolinks
 //= require jquery3
+//= require jquery_ujs
 //= require popper
 //= require bootstrap-sprockets
 //= require_tree .
+
+$(document).ready(function() {
+	$(".show").click(function(event){
+		var id = $(this).attr("id").split(";");
+		$("#"+id[0]+"_1").load("https://localhost:3000/users/"+id[0]+"/teams/"+id[1])
+	});
+})

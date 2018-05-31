@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180522095406) do
+ActiveRecord::Schema.define(version: 20180530131320) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 20180522095406) do
     t.bigint "pp_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["pp_id", "user_id"], name: "index_giocas_on_pp_id_and_user_id", unique: true
     t.index ["pp_id"], name: "index_giocas_on_pp_id"
     t.index ["squadra", "ruolo", "pp_id"], name: "index_giocas_on_squadra_and_ruolo_and_pp_id", unique: true
     t.index ["user_id"], name: "index_giocas_on_user_id"
@@ -50,6 +51,7 @@ ActiveRecord::Schema.define(version: 20180522095406) do
     t.datetime "updated_at", null: false
     t.index ["team_id", "ruolo"], name: "index_membros_on_team_id_and_ruolo", unique: true
     t.index ["team_id"], name: "index_membros_on_team_id"
+    t.index ["user_id", "team_id"], name: "index_membros_on_user_id_and_team_id", unique: true
     t.index ["user_id"], name: "index_membros_on_user_id"
   end
 
@@ -62,6 +64,7 @@ ActiveRecord::Schema.define(version: 20180522095406) do
     t.bigint "receiver_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "read_at"
     t.index ["receiver_id"], name: "index_notifications_on_receiver_id"
     t.index ["sender_id"], name: "index_notifications_on_sender_id"
   end
@@ -97,11 +100,12 @@ ActiveRecord::Schema.define(version: 20180522095406) do
   end
 
   create_table "sqs", force: :cascade do |t|
-    t.bigint "notificatio_id"
+    t.bigint "notification_id"
     t.bigint "team_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["notificatio_id"], name: "index_sqs_on_notificatio_id"
+    t.string "ruolo"
+    t.index ["notification_id"], name: "index_sqs_on_notification_id"
     t.index ["team_id"], name: "index_sqs_on_team_id"
   end
 
@@ -111,6 +115,7 @@ ActiveRecord::Schema.define(version: 20180522095406) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["pt_id", "user_id"], name: "index_squadras_on_pt_id_and_user_id", unique: true
     t.index ["pt_id"], name: "index_squadras_on_pt_id"
     t.index ["ruolo", "pt_id"], name: "index_squadras_on_ruolo_and_pt_id", unique: true
     t.index ["user_id"], name: "index_squadras_on_user_id"
@@ -150,6 +155,7 @@ ActiveRecord::Schema.define(version: 20180522095406) do
     t.string "uid"
     t.string "provider"
     t.string "token"
+    t.integer "roles_mask"
   end
 
 end

@@ -1,0 +1,6 @@
+%ul
+	- @notifications.each do |n|
+		%li 
+			= n.msg
+			= link_to "Accetta", notifications_accept_path(n)
+			= link_to "Rifiuta", notifications_deny_path(n)

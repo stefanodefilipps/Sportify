@@ -1,36 +1,3 @@
-#menu ul {
-	text-align:center; 
-	margin: 0 auto;
-	list-style-type:none; /* Stile della lista */
-}
-
-#menu li {
-	display:inline;
-}
-
-#menu a {
-	display: inline-block;
-	color:black; /* Colore del testo */
-	background:white; /* Colore dello sfondo */
-	padding:4px 50px; /* Distanza tra le singole voci */
-	border-right:180px solid #ffffff;
-}
-
-#search{
-  	height: 20px;
-  	width: 150px;
-  	border-radius: 10px;
-  	border-right:80px solid #ffffff;
-}
-
-#bar{
-	position: absolute;
-	top:100px;
-	left: 30px;
-}
-
-
-
 #image{
 	border-radius: 180px;
 }
@@ -38,9 +5,9 @@
 #container{
 	position: absolute;
 	top: 160px;
-	right: 380px;
+	left: 650px;
 	width: 550px;
-	height: 400px;
+	height: 500px;
 	border:2px black solid;
 	border-radius: 5px;
 }
@@ -115,7 +82,7 @@
 
 #bottom{
 	position: absolute;
-	top:350px;
+	top:400px;
 	left:30px;
 }
 

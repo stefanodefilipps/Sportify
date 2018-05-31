@@ -1,16 +1,19 @@
 class User < ApplicationRecord
 
-	has_many :gioca
+	has_many :gioca 
 	has_many :pp, through: :gioca
 	has_many :squadra 
 	has_many :pt, through: :squadra
 	has_many :membro
 	has_many :team, through: :membro
 	has_many :compagni, class_name: "User"
+	has_many :notifications
 
 	 # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
 	devise :omniauthable, :omniauth_providers => [:facebook]
+
+	acts_as_user :roles => [ :captain, :match_creator ]
 	
 
 	#la funzione seguente serve per trovare un utente che ha ia fatto il login con facebbok o a crearne uno con le credenziali minime

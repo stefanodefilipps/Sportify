@@ -2,11 +2,11 @@
 %html
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title creasquadra
+    %title utentetrovato
     %link{:crossorigin => "anonymous", :href => "https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css", :integrity => "sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB", :rel => "stylesheet"}/
-    = stylesheet_link_tag "mostraeventi.css"
     = stylesheet_link_tag "index_team.css"
-    = stylesheet_link_tag "creasquadra.css"
+    = stylesheet_link_tag "utentetrovato.css"
+    = stylesheet_link_tag "mostraeventi.css"
     %link{:crossorigin => "anonymous", :href => "https://use.fontawesome.com/releases/v5.0.13/css/all.css", :integrity => "sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp", :rel => "stylesheet"}/
     %link{:href => "https://fonts.googleapis.com/css?family=Merriweather+Sans", :rel => "stylesheet"}/
   %body{:style => "font-family: 'Merriweather Sans', sans-serif; margin-left: 0.9%; margin-right: 0.9%;"}
@@ -29,43 +29,30 @@
     .row
       .col-2.border-right{:style => "margin-left: 1.4%"}
         .container.user_column
-          = image_tag("#{@user.img}",height: '130', width: '130', align: "center", id: "image", class: "user_column_obj")
+          = image_tag("#{current_user.img}",height: '130', width: '130', align: "center", id: "image", class: "user_column_obj")
         .container.user_column
           %p.user_column_obj
             %b#nick Nickname:
-            = @user.nick
+            = current_user.nick
         .container.user_column
           %p.user_column_obj
             %b#val Valutazione:
-            - if @user.voto != nil
-              @user.voto
+            - if current_user.voto != nil
+              current_user.voto
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b Teams
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b Logout
-    #center
+
+    #utentetrovato
       %p
-        %b Crea Squadra
-        
-    #formteam
-      = form_tag "/users/#{@user.id}/teams", method: "post" do
-        .form-group
-          = text_field_tag "P",nil, class: "form-control", placeholder: "Nickname portiere", autofocus: true
-        .form-group
-          = text_field_tag "D",nil, class: "form-control", placeholder: "Nickname difensore", autofocus: true
-        .form-group
-          = text_field_tag "C1",nil, class: "form-control", placeholder: "Nickname centrocampista 1", autofocus: true
-        .form-group
-          = text_field_tag "C2",nil, class: "form-control", placeholder: "Nickname centrocampista 2", autofocus: true
-        .form-group
-          = text_field_tag "A",nil, class: "form-control", placeholder: "Nickname attaccante", autofocus: true
-        #nameteam
-        .form-group
-          = text_field_tag "nome",nil, class: "form-control", placeholder: "Nome della squadra", autofocus: true
-        #savebutt
-        .form-group
-          = submit_tag "Crea Squadra", class: "btn btn-primary mb-2"
-
-
+        %b Utenti trovati
+      %br/
+      #barratesto
+        %input#nickname{:name => "nicknameutente", :readonly => "readonly", :type => "text"}/
+        %button#button1.btn.btn-primary
+          %b Vedi profilo utente
+        %br/
+        %br/

@@ -1,0 +1,65 @@
+Matches found 1
+
+- @matches_pp.each do |m|
+  %ul
+    %li
+      = m.punt1
+    %li
+      = m.punt2
+    %li
+      = m.ora
+    %li
+      = m.data
+    %li
+      = m.campo
+    %br
+    %br
+
+    Roles Left
+
+    - @roles_left_pp["#{m.id}"].each do |r|
+      %li
+        = r
+%br
+%br
+Matches found 2
+
+- @matches_pt.each do |m|
+  %ul
+    %li
+      = m.punt1
+    %li
+      = m.punt2
+    %li
+      = m.ora
+    %li
+      = m.data
+    %li
+      = m.campo
+    %br
+    %br
+
+    Roles Left
+
+    - @roles_left_pp["#{m.id}"].each do |r|
+      %li
+        = r
+
+%br
+%br
+Matches found 3
+
+- @matches_tt.each do |m|
+  %ul
+    %li
+      = m.punt1
+    %li
+      = m.punt2
+    %li
+      = m.ora
+    %li
+      = m.data
+    %li
+      = m.campo
+    %br
+    %br

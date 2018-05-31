@@ -1,65 +1,65 @@
-Matches found 1
-
-- @matches_pp.each do |m|
-	%ul
-		%li
-			= m.punt1
-		%li
-			= m.punt2
-		%li
-			= m.ora
-		%li
-			= m.data
-		%li
-			= m.campo
-		%br
-		%br
-
-		Roles Left
-
-		- @roles_left_pp["#{m.id}"].each do |r|
-			%li
-				= r
-%br
-%br
-Matches found 2
-
-- @matches_pt.each do |m|
-	%ul
-		%li
-			= m.punt1
-		%li
-			= m.punt2
-		%li
-			= m.ora
-		%li
-			= m.data
-		%li
-			= m.campo
-		%br
-		%br
-
-		Roles Left
-
-		- @roles_left_pp["#{m.id}"].each do |r|
-			%li
-				= r
-
-%br
-%br
-Matches found 3
-
-- @matches_tt.each do |m|
-	%ul
-		%li
-			= m.punt1
-		%li
-			= m.punt2
-		%li
-			= m.ora
-		%li
-			= m.data
-		%li
-			= m.campo
-		%br
-		%br
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title cercapartita
+    %link{:crossorigin => "anonymous", :href => "https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css", :integrity => "sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB", :rel => "stylesheet"}/
+    = stylesheet_link_tag "cerca.css"
+    = stylesheet_link_tag "mostraeventi.css"
+    = stylesheet_link_tag "index_team.css"
+    %link{:crossorigin => "anonymous", :href => "https://use.fontawesome.com/releases/v5.0.13/css/all.css", :integrity => "sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp", :rel => "stylesheet"}/
+    %link{:href => "https://fonts.googleapis.com/css?family=Merriweather+Sans", :rel => "stylesheet"}/
+  %body{:style => "font-family: 'Merriweather Sans', sans-serif; margin-left: 0.9%; margin-right: 0.9%;"}
+    .row
+      %nav.navbar.navbar-light.barra
+        .col-3
+          .container
+            %form.form-inline
+              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search"}/
+              %button.btn.btn-outline-success.my-2.my-sm-0{:type => "submit"} Search
+        .col-3
+          %a{:href => "#"}
+            %b Profile
+        .col-3
+          %a{:href => "#"}
+            %b Play
+        .col-3
+          %a{:href => "#"}
+            %b Home
+    #maps
+      %iframe{:allowfullscreen => "", :frameborder => "0", :height => "500", :src => "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d23754.43534331145!2d12.513070676217678!3d41.9078141916421!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132f6196f9928ebb%3A0xb90f770693656e38!2sRoma+RM!5e0!3m2!1sit!2sit!4v1526561360448", :style => "border:0", :width => "600"}
+    #partite
+      %p
+        %b Partite Trovate
+      #return
+        %label Nome Evento:
+        %br/
+        %input#partita{:readonly => "readonly"}/
+        %br/
+        %br/
+        %label Data,Ora,Luogo:
+        %br/
+        %input#data{:readonly => "readonly", :type => "date"}/
+        %input#ora{:readonly => "readonly"}/
+        %input#dove{:readonly => "readonly"}/
+        %br/
+        %br/
+        %div
+          %label
+            %b Ruoli disponibili:
+          %br/
+          %input#P{:disabled => "disabled", :type => "checkbox"}/
+          %label{:for => "P"} P
+          %br/
+          %input#D{:disabled => "disabled", :type => "checkbox"}/
+          %label{:for => "D"} D
+          %br/
+          %input#C1{:disabled => "disabled", :type => "checkbox"}/
+          %label{:for => "C1"} C1
+          %br/
+          %input#C2{:disabled => "disabled", :type => "checkbox"}/
+          %label{:for => "C2"} C2
+          %br/
+          %input#A{:disabled => "disabled", :type => "checkbox"}/
+          %label{:for => "A"} A
+          %br/

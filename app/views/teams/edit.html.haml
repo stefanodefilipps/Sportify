@@ -1,0 +1,7 @@
+= form_tag "/users/#{current_user.id}/teams/#{@team.id}", method: "put" do
+	.form-group
+		= label_tag :nome, "Nome della squadra"
+		= text_field_tag "nome",nil, class: "form-control", placeholder: "Nome della squadra", autofocus: true
+	.form-group
+		= submit_tag "cambia nome della squadra", class: "btn btn-primary mb-2"
+	

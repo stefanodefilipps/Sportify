@@ -42,6 +42,8 @@ gem 'jquery-rails'
 gem 'popper_js', '~> 1.11', '>= 1.11.1'
 gem 'httparty'
 gem 'geokit-rails'
+gem 'canard', '~> 0.5.0.pre'
+gem 'jquery-rails'
 
 
 group :development, :test do
@@ -50,6 +52,8 @@ group :development, :test do
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
 end
 
 group :development do
@@ -59,6 +63,15 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+end
+
+group :test do
+  gem 'faker'
+  gem 'guard-rspec'
+  gem 'launchy'
+  gem 'cucumber-rails', require: false
+  # database_cleaner is not required, but highly recommended
+  gem 'database_cleaner'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
