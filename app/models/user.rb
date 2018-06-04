@@ -1,7 +1,7 @@
 class User < ApplicationRecord
 
 	has_many :gioca 
-	has_many :pp, through: :gioca
+	has_many :uu, through: :gioca
 	has_many :squadra 
 	has_many :pt, through: :squadra
 	has_many :membro

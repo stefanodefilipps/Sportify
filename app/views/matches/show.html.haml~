@@ -13,17 +13,17 @@
 	%p
 		%input{:type => "text", :name => "punt1"}/
 		%input{:type => "text", :name => "punt2"}/
-		%input{:type => "submit", :value => "fine partita!"}/
+		%input{:type => "submit", :value => "endgame"}/
 
-%form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/leavep", :method => "get"}
+%form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/leave", :method => "get"}
 	%p
-		%input{:type => "submit", :value => "lascia evento"}/
-%form{:action => "https://localhost:3000/users/:id/matches/"+@m.id.to_s+"/redirect", :method => "get"}
+		%input{:type => "submit", :value => "leave"}/
+%form{:action => "https://localhost:3000/redirect", :method => "get"}
 	%p
-		%input{:type => "submit", :value => "aggiungi a google calendar"}/
-%form{:action => "https://localhost:3000/users/:id/matches/"+@m.id.to_s+"/destroy", :method => "get"}
+		%input{:type => "submit", :value => "autentica google maps"}/
+%form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/calendar", :method => "post"}
 	%p
-		%input{:type => "submit", :value => "distruggi evento"}/
+		%input{:type => "submit", :value => "aggiungi al calendario"}/
 		
 - if @m.tipo == 2
 	- @single_players.each do |sp|

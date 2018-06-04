@@ -24,6 +24,25 @@ class UsersController < ApplicationController
 	#se tutto va bene faccio una redirect alla root(per adesso)
 	#IN SEGUITO DEVO FARE UNA REDIRECT AL CONTROLLER DEI MATCH perchè devo andare nella view che prende tutte le partite ancora da giocare o giocate dell'utente
 	
+
+	def update
+		@user=User.find_by(:id,params[:user_id])
+		if(params[:desc]!="")
+			@user.desc=params[:desc]
+			@user.save
+	    elsif(params[:ruolo1]!="" || params[:ruolo2]!= "")
+            if(params[:ruolo1]!="")
+            	@user.ruolo1=params[:ruolo1]
+			    @user.save
+            else
+            	@user.ruolo2=params[:ruolo2]
+			    @user.save
+			end
+	    end
+	    redirect_to action:"show", id: @user.id
+
+	end
+	
 	def create
 		par = user_params
 		puts par 
