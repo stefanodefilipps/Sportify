@@ -1,4 +1,4 @@
 class Gioca < ApplicationRecord
 	belongs_to :user
-	belongs_to :pp
+	belongs_to :uu
 end

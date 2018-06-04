@@ -18,9 +18,9 @@ Rails.application.routes.draw do
   post '/users/:id/matches/:match_id/endgame', to: "matches#endgame"
   post 'findplaces', to: "matches#findcourts"
 
-  get '/users/:id/matches/:match_id/redirect', to: 'matches#redirect', as: 'redirect'
+  get '/redirect', to: 'matches#redirect', as: 'redirect'
   get '/callback', to: 'matches#callback', as: 'callback'
-  
+  get '/users/:id/matches/:match_id/calendar', to: 'matches#new_event', as: 'calendars'
 
   get '/matches/near', to: "matches#near", as: "matches_near"
   put '/users/:user_id/teams/:id/leave', to: "teams#leave", as: "teams_leave"

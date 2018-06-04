@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180530131320) do
+ActiveRecord::Schema.define(version: 20180604162041) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,13 +19,13 @@ ActiveRecord::Schema.define(version: 20180530131320) do
     t.string "squadra"
     t.string "ruolo"
     t.bigint "user_id"
-    t.bigint "pp_id"
+    t.bigint "uu_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["pp_id", "user_id"], name: "index_giocas_on_pp_id_and_user_id", unique: true
-    t.index ["pp_id"], name: "index_giocas_on_pp_id"
-    t.index ["squadra", "ruolo", "pp_id"], name: "index_giocas_on_squadra_and_ruolo_and_pp_id", unique: true
+    t.index ["squadra", "ruolo", "uu_id"], name: "index_giocas_on_squadra_and_ruolo_and_uu_id", unique: true
     t.index ["user_id"], name: "index_giocas_on_user_id"
+    t.index ["uu_id", "user_id"], name: "index_giocas_on_uu_id_and_user_id", unique: true
+    t.index ["uu_id"], name: "index_giocas_on_uu_id"
   end
 
   create_table "matches", force: :cascade do |t|
@@ -76,13 +76,6 @@ ActiveRecord::Schema.define(version: 20180530131320) do
     t.datetime "updated_at", null: false
     t.index ["match_id"], name: "index_pars_on_match_id"
     t.index ["notification_id"], name: "index_pars_on_notification_id"
-  end
-
-  create_table "pps", force: :cascade do |t|
-    t.bigint "match_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["match_id"], name: "index_pps_on_match_id"
   end
 
   create_table "pts", force: :cascade do |t|
@@ -156,6 +149,13 @@ ActiveRecord::Schema.define(version: 20180530131320) do
     t.string "provider"
     t.string "token"
     t.integer "roles_mask"
+  end
+
+  create_table "uus", force: :cascade do |t|
+    t.bigint "match_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["match_id"], name: "index_uus_on_match_id"
   end
 
 end

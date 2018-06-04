@@ -1,0 +1,71 @@
+!!!
+%html
+  %body
+    %form{:action => "https://localhost:3000/users/1/matches/", :method => "post"}
+      %p
+        punt1
+        %input{:name => "punt1", :type => "text"}/
+      %p
+        punt2
+        %input{:name => "punt2", :type => "text"}/
+      %p
+        data
+        %input{:name => "data", :type => "date"}/
+      %p
+        ora
+        %input{:name => "ora", :type => "time"}/
+      %p
+        lat
+        %input{:name => "lat", :type => "text"}/
+      %p
+        lng
+        %input{:name => "lng", :type => "text"}/
+      %p tipo
+      %p
+        pp
+        %input{:name => "tipo", :type => "checkbox", :value => "pp"}/
+      %p
+        pt
+        %input{:name => "tipo", :type => "checkbox", :value => "pt"}/
+      %p
+        tt
+        %input{:name => "tipo", :type => "checkbox", :value => "tt"}/
+      %p
+        g1
+        %input{:name => "g1", :type => "text"}/
+      %p
+        g2
+        %input{:name => "g2", :type => "text"}/
+      %p
+        g3
+        %input{:name => "g3", :type => "text"}/
+      %p
+        g4
+        %input{:name => "g4", :type => "text"}/
+      %p
+        g5
+        %input{:name => "g5", :type => "text"}/
+      %p
+        g6
+        %input{:name => "g6", :type => "text"}/
+      %p
+        g7
+        %input{:name => "g7", :type => "text"}/
+      %p
+        g8
+        %input{:name => "g8", :type => "text"}/
+      %p
+        g9
+        %input{:name => "g9", :type => "text"}/
+      %p
+        g10
+        %input{:name => "g10", :type => "text"}/
+      %p
+        team1
+        %input{:name => "team1", :type => "text"}/
+      %p
+        team2
+        %input{:name => "team2", :type => "text"}/
+      %p
+        %input{:type => "submit", :value => "mannala"}/
+

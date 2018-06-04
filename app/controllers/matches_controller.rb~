@@ -1,18 +1,16 @@
 class MatchesController < ApplicationController
-        protect_from_forgery with: :null_session
-        
-    
+
 	#Questa action permette di vedere in dettaglio la partita distinta da id_match definito nella url. Prima controllo che 
 	#lo user partecipi effettivamente al match, altrimenti lo rimando su root. Se il test viene verificato allora:
-	#-Se la partita è uu mi prendo la collezione dei gioca associati a quella partita così da avere tutti gli utenti che 
+	#-Se la partita è pp mi prendo la collezione dei gioca associati a quella partita così da avere tutti gli utenti che 
 	#partecipano alla partita e anche i ruoli da poter far vedere
 	#-Se la partita è pt mi prendo la collezione dei squadra associata a quella partita così da avere tutti gli utenti singoli che 
 	#partecipano a quella partita. Inoltre se è stata assegnata una squadra a pt, allora dalla squadra mi prendo tutti i membro 
 	#di quella squadra codì da poter risalire velocemente agli user di quella squadra che partecipano alla partita con i ruoli
-	#definiti dalla loro auuartenenza alla squadra
+	#definiti dalla loro appartenenza alla squadra
 	#-Se la partita è tt, allora controllo se ho entrambe le squadre e di ogni squadra mi prendo le relazioni membro così da avere
 	#i giocatori che partecipano alla partita con i loro rispettivi ruoli che coincidono con quelli della loro associazione con
-	#la squadra di auuartenenza
+	#la squadra di appartenenza
 
 	def show
 		user = User.find_by id: params[:user_id]
@@ -23,7 +21,7 @@ class MatchesController < ApplicationController
 			redirect_to root_path
 		end
 		if @m.tipo == 1
-			@players = @m.uu.gioca
+			@players = @m.pp.gioca
 		elsif @m.tipo == 2
 			@single_players = @m.pt.squadra
 			if m.pt.team != nil
@@ -44,7 +42,7 @@ class MatchesController < ApplicationController
 	#Con questo metodo restituisco tutti i match in cui un giocatore è presente o come utente singolo o come componente di una
 	#squadra. Restituisco un array di oggetti Match da cui posso poi risalire a tutti i vari componenti utili di un match se 
 	#devo mostrare informazioni aggiuntive
-	#dalla url mi estraggo l'id dell'user e lo trovo nel database. In seguito mi trovvo prima tutti i uu a cui partecipa e 
+	#dalla url mi estraggo l'id dell'user e lo trovo nel database. In seguito mi trovvo prima tutti i pp a cui partecipa e 
 	#da questi mi prendo i match a cui si riferiscono. Dopo prendo tutti i pt a cui partecipa come utente singolo e mi prendo
 	#il match corrispondente. In seguito mi prendo tutti i team a cui partecipa. Per ogni team mi prendo tutti i pt a cui partecipa 
 	#e i match in cui è stata inserita la squadra e quindi i match pt a cui partecipa l'user tramite la squadra. Di ogni squadra
@@ -53,11 +51,11 @@ class MatchesController < ApplicationController
 	def index
 		user = User.find_by id: params[:user_id]
 		puts user
-		matches_uu = user.uu
+		matches_pp = user.pp
 		matches_pt_s = user.pt
 		user_teams = user.team
 		@matches = Array.new
-		matches_uu.each do |p|
+		matches_pp.each do |p|
 			@matches.push p.match
 		end
 		matches_pt_s.each do |p|
@@ -80,8 +78,8 @@ class MatchesController < ApplicationController
 	#Oltre alla query spaziale sul modelli Match devo prendere anche quelle partite che non sono complete e per questo faccio
 	#3 query differenti in base alla sottomodello che il modello Match è legato.
 	#Considero la prima query che le altre 2 sono simili.
-	#Faccio una join tra match, uu e gioca e le raggruuuo per uus.id,matches.id e conto quante istanze della relazione gioca
-	#contiene un certo uus.id(dato che ho fatto la group) e prendo solo quelli che il conto è minore di 10, perchè vuol dire 
+	#Faccio una join tra match, pp e gioca e le raggruppo per pps.id,matches.id e conto quante istanze della relazione gioca
+	#contiene un certo pps.id(dato che ho fatto la group) e prendo solo quelli che il conto è minore di 10, perchè vuol dire 
 	#che ci sono ancora dei posti disponibili per qualche giocatore
 	#Dopo le query creo un hash che ha come chiave l'id di un match e come valore i ruoli disponibili per quel match, trovati
 	#tramite la funzione di ausilio "find_roles_left" e passo questo hash come variabile di istanza così che è accessibile 
@@ -96,16 +94,16 @@ class MatchesController < ApplicationController
 			puts coordinates[0]
 			redirect_to root_path
 		else
-			@matches_uu = Match.within(5, :origin => coordinates).joins(uu: :gioca).group("uus.id,matches.id").having("count(uus.id) < 10").select("uus.*, matches.*")
+			@matches_pp = Match.within(5, :origin => coordinates).joins(pp: :gioca).group("pps.id,matches.id").having("count(pps.id) < 10").select("pps.*, matches.*")
 			@matches_pt = Match.within(5, :origin => coordinates).joins(pt: [:squadra, :team]).group("pts.id,matches.id").having("count(pts.id) < 6").select("pts.*, matches.*")
 			@matches_tt = Match.within(5, :origin => coordinates).joins(tt: :team).group("tts.id,matches.id").having("count(tts.id) < 2").select("tts.*, matches.*")
-			@roles_left_uu = Hash.new
-			@matches_uu.each do |m_uu|
-				@roles_left_uu["#{m_uu.id}"] = find_roles_left(m_uu,"uu")
+			@roles_left_pp = Hash.new
+			@matches_pp.each do |m_pp|
+				@roles_left_pp["#{m_pp.id}"] = find_roles_left(m_pp,"pp")
 			end
 			@roles_left_pt = Hash.new
 			@matches_pt.each do |m_pt|
-				@roles_left_pt["#{m_uu.id}"] = find_roles_left(m_pt,"pt")
+				@roles_left_pt["#{m_pp.id}"] = find_roles_left(m_pt,"pt")
 			end
 		end
 		
@@ -119,21 +117,19 @@ class MatchesController < ApplicationController
 		response=HTTParty.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=calcetto&location='+coordinates[0].to_s+','+coordinates[1].to_s+
       '&radius=3000&key=AIzaSyDcD5M36rW3mAStLyxu3gsjwhOwi_LmHvI')
 		r = JSON.parse response.body
-		array=Array.new
+		
 		r["results"].each do |t|
 			puts t["geometry"]["location"]["lng"]
 			puts t["geometry"]["location"]["lat"]
-			array.push {"lng"=> t["geometry"]["location"]["lng"],"lat"=> t["geometry"]["location"]["lat"],"nome" => t["name"]}
-
+			@courts += t["name"]
 		end
-
 		
 
 	end
 
     #CREA EVENTO
 	def create
-		    if(params[:tipo]=="uu")
+		    if(params[:tipo]=="pp")
 				params.each do |k,v|
 				if(k[0]=="g" )
 					if(v != "")
@@ -156,55 +152,71 @@ class MatchesController < ApplicationController
 		    	@match.tipo=1
 		    	@match.creatore_id=params[:user_id]
 		    	@match.save
-		    	@uu=Uu.create(match_id: @match.id)
+		    	@pp=Pp.create(match_id: @match.id)
             	if(params[:g1]!="")
-				gioca1=Gioca.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"portiere",squadra:"a", uu_id: @uu.id)
+				gioca1=Gioca.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"portiere",squadra:"a", pp_id: @pp.id)
 				User.find_by(nick: params[:g1]).gioca << gioca1
-				
+				#User.find_by(nick: params[:g1]).pp << @pp
 			end
 		    if(params[:g2]!="")
 		      
-				gioca2=Gioca.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"difensore",squadra:"a",uu_id: @uu.id)
-				User.find_by(nick: paramsì[:g2]).gioca << gioca2	
+				gioca2=Gioca.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"difensore",squadra:"a",pp_id: @pp.id)
+				User.find_by(nick: paramsì[:g2]).gioca << gioca2
+				User.find_by(nick: params[:g2]).pp << @pp
+			  
 			end
 		    if(params[:g3]!="")
 		    	
-				gioca3=Gioca.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"centro1",squadra:"a", uu_id: @uu.id)
+				gioca3=Gioca.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"centro1",squadra:"a", pp_id: @pp.id)
 				User.find_by(nick: params[:g3]).gioca << gioca3
+				User.find_by(nick: params[:g3]).pp << @pp
+			
 			end
 		    if(params[:g4]!="")
 		    	
-				gioca4=Gioca.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"centro2",squadra:"a", uu_id: @uu.id)
-				User.find_by(nick: params[:g4]).gioca << gioca4   
+				gioca4=Gioca.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"centro2",squadra:"a", pp_id: @pp.id)
+				User.find_by(nick: params[:g4]).gioca << gioca4
+				User.find_by(nick: params[:g4]).pp << @pp
+			    
 			end
 		    if(params[:g5]!="")
 		    	
-				gioca5=Gioca.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"attaccante",squadra:"a", uu_id: @uu.id)
-				User.find_by(nick: params[:g5]).gioca << gioca5    
+				gioca5=Gioca.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"attaccante",squadra:"a", pp_id: @pp.id)
+				User.find_by(nick: params[:g5]).gioca << gioca5
+				User.find_by(nick: params[:g5]).pp << @pp
+			    
 			end
 		    if(params[:g6]!="")
 		    	
-				gioca6=Gioca.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"portiere",squadra:"b", uu_id: @uu.id)
-				User.find_by(nick: params[:g6]).gioca << gioca6    
+				gioca6=Gioca.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"portiere",squadra:"b", pp_id: @pp.id)
+				User.find_by(nick: params[:g6]).gioca << gioca6
+				User.find_by(nick: params[:g6]).pp << @pp
+			    
 			end
 		    if(params[:g7]!="")
 		    	
-				gioca7=Gioca.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"difensore",squadra:"b", uu_id: @uu.id)
+				gioca7=Gioca.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"difensore",squadra:"b", pp_id: @pp.id)
 				User.find_by(nick: params[:g7]).gioca << gioca7
+				User.find_by(nick: params[:g7]).pp << @pp
+			
 			end
 		    if(params[:g8]!="")
 		    	
-				gioca8=Gioca.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"centro1",squadra:"b", uu_id: @uu.id)
+				gioca8=Gioca.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"centro1",squadra:"b", pp_id: @pp.id)
 				User.find_by(nick: params[:g8]).gioca << gioca8
+				User.find_by(nick: params[:g8]).pp << @pp
 			end
 		    if(params[:g9]!="")
-				gioca9=Gioca.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"centro2",squadra:"b", uu_id: @uu.id)
+				gioca9=Gioca.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"centro2",squadra:"b", pp_id: @pp.id)
 				User.find_by(nick: params[:g9]).gioca << gioca9
+				User.find_by(nick: params[:g9]).pp << @pp
 			end
 		    if(params[:g10]!="")
 		    	
-				gioca10=Gioca.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"attaccante",squadra:"b", uu_id: @uu.id)
+				gioca10=Gioca.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"attaccante",squadra:"b", pp_id: @pp.id)
 				User.find_by(nick: params[:g10]).gioca << gioca10
+				User.find_by(nick: params[:g10]).pp << @pp
+			    
 			end
             elsif(params[:tipo]=="pt")
 			if(params[:team2]!="")
@@ -242,22 +254,27 @@ class MatchesController < ApplicationController
 				if(params[:g1]!="")
 					s1=Squadra.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"portiere",squadra:"a", pt_id: @pt.id)
 					User.find_by(nick: params[:g1]).squadra << s1
+					User.find_by(nick: params[:g1]).pt << @pt
 				end
 		    	if(params[:g2]!="")
 					s2=Squadra.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"difensore",squadra:"a",pt_id: @pt.id)
 					User.find_by(nick: params[:g2]).squadra << s2
+					User.find_by(nick: params[:g2]).pt << @pt
 				end
 		    	if(params[:g3]!="")
 					s3=Squadra.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"centro1",squadra:"a", pt_id: @pt.id)
 					User.find_by(nick: params[:g3]).squadra << s3
+					User.find_by(nick: params[:g3]).pt << @pt
 				end
 		    	if(params[:g4]!="")
 					s4=Squadra.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"centro2",squadra:"a", pt_id: @pt.id)
 					User.find_by(nick: params[:g4]).squadra << s4
+					User.find_by(nick: params[:g4]).pt << @pt
 				end
 		    	if(params[:g5]!="")
 					s5=Squadra.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"attaccante",squadra:"a", pt_id: @pt.id)
 					User.find_by(nick: params[:g5]).squadra << s5
+					User.find_by(nick: params[:g5]).pt << @pt
 				end
             else
             	if(Team.find_by(nome: params[:team2])==nil) 
@@ -294,22 +311,27 @@ class MatchesController < ApplicationController
 		    	if(params[:g6]!="")
 					s6=Squadra.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"portiere",squadra:"b", pt_id: @pt.id)
 					User.find_by(nick: params[:g6]).squadra << s6
+					User.find_by(nick: params[:g6]).pt << @pt
 				end
 		    	if(params[:g7]!="")
 					s7=Squadra.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"difensore",squadra:"b", pt_id: @pt.id)
 					User.find_by(nick: params[:g7]).squadra << s7
+					User.find_by(nick: params[:g7]).pt << @pt
 				end
 		    	if(params[:g8]!="")
 					s8=Squadra.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"centro1",squadra:"b", pt_id: @pt.id)
 					User.find_by(nick: params[:g8]).squadra << s8
+					User.find_by(nick: params[:g8]).pt << @pt
 		    	end
 		    	if(params[:g9]!="")
 					s9=Squadra.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"centro2",squadra:"b", pt_id: @pt.id)
 					User.find_by(nick: params[:g9]).squadra << s9
+					User.find_by(nick: params[:g9]).pt << @pt
 				end
 		    	if(params[:g10]!="")
 					s10=Squadra.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"attaccante",squadra:"b", pt_id: @pt.id)
 					User.find_by(nick: params[:g10]).squadra << s10
+					User.find_by(nick: params[:g10]).pt << @pt
             	end
             end
             elsif(params[:tipo]=="tt")
@@ -356,17 +378,17 @@ class MatchesController < ApplicationController
 			puts coordinates[0]
 			redirect_to root_path
 		else
-			@matches_uu = Match.within(5, :origin => coordinates).joins(uu: :gioca).group("uus.id,matches.id").having("count(uus.id) < 10").select("uus.*, matches.*")
+			@matches_pp = Match.within(5, :origin => coordinates).joins(pp: :gioca).group("pps.id,matches.id").having("count(pps.id) < 10").select("pps.*, matches.*")
 			@matches_pt = Match.within(5, :origin => coordinates).joins(pt: [:squadra, :team]).group("pts.id,matches.id").having("count(pts.id) < 6").select("pts.*, matches.*")
 			@matches_tt = Match.within(5, :origin => coordinates).joins(tt: :team).group("tts.id,matches.id").having("count(tts.id) < 2").select("tts.*, matches.*")
 
-			@roles_left_uu = Hash.new
-			@matches_uu.each do |m_uu|
-				@roles_left_uu["#{m_uu.id}"] = find_roles_left(m_uu,"uu")
+			@roles_left_pp = Hash.new
+			@matches_pp.each do |m_pp|
+				@roles_left_pp["#{m_pp.id}"] = find_roles_left(m_pp,"pp")
 			end
 			@roles_left_pt = Hash.new
 			@matches_pt.each do |m_pt|
-				@roles_left_pt["#{m_uu.id}"] = find_roles_left(m_pt,"pt")
+				@roles_left_pt["#{m_pp.id}"] = find_roles_left(m_pt,"pt")
 			end
 		end
 
@@ -397,10 +419,11 @@ class MatchesController < ApplicationController
     #salvo il match sul google calendar GOOGLE CALENDAR
 
 
+
+
 	def redirect
-		require 'google/apis/calendar_v3'
-		session[:match_id]=params[:match_id]
 		client = Signet::OAuth2::Client.new(client_options)
+
         redirect_to client.authorization_uri.to_s
 		
 	end
@@ -408,23 +431,36 @@ class MatchesController < ApplicationController
 	def callback
     client = Signet::OAuth2::Client.new(client_options)
     client.code = params[:code]
+
     response = client.fetch_access_token!
+
     session[:authorization] = response
+
+    redirect_to rooth_path
+    end
+
+     def new_event
+    client = Signet::OAuth2::Client.new(client_options)
+    client.update!(session[:authorization])
+
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
-    m=Match.find_by(id: session[:match_id])
-    start = DateTime.new(m.data.year,m.data.month,m.data.day,m.ora.hour,m.ora.min)
-    finish = DateTime.new(m.data.year,m.data.month,m.data.day,m.ora.hour+1,m.ora.min)
+    m=find_by(id: params[:match_id])
+    start = Date.new(m.date.year,m.date.month,m.date.day,m.time.hour,m.time.minutes)
+    finish = Date.new(m.date.year,m.date.month,m.date.day,m.time.hour+1,m.time.minutes)
     event = Google::Apis::CalendarV3::Event.new({
-      start: Google::Apis::CalendarV3::EventDateTime.new(date_time: start),
-      end: Google::Apis::CalendarV3::EventDateTime.new(date_time: finish ),
-      summary: 'PARTITA DI CALCETTO!'
+      start: Google::Apis::CalendarV3::EventDateTime.new(date: start),
+      end: Google::Apis::CalendarV3::EventDateTime.new(date: finish),
+      summary: 'partita di calcetto!'
     })
-    service.insert_event("primary", event)
 
-    redirect_to root_path
+    service.insert_event(params[:calendar_id], event)
 
+    redirect_to rooth_path
     end
+
+
+
 
     
     #abbandona evento come squadra
@@ -454,8 +490,8 @@ class MatchesController < ApplicationController
 	#abbandona evento come player
 	def leaveplayer
 		@match=Match.find_by(id: params[:match_id])
-		if(@match.uu!=nil)
-			@partita=Gioca.find_by(user_id: params[:id],uu_id: @match.uu)
+		if(@match.pp!=nil)
+			@partita=Gioca.find_by(user_id: params[:id],pp_id: @match.pp)
 			if(@partita!=nil) 
 				@partita.destroy
 				redirect_to root_path
@@ -497,17 +533,6 @@ class MatchesController < ApplicationController
 
 	private 
 
-	def client_options
-    {
-      client_id: Rails.application.secrets.google_client_id,
-      client_secret: Rails.application.secrets.google_client_secret,
-      authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
-      token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
-      scope: Google::Apis::CalendarV3::AUTH_CALENDAR,
-      redirect_uri: callback_url
-    }
-    end
-
 	def find_coordinates(address, city)
 
 		response = HTTParty.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+','+city+'&key=AIzaSyBrpRP5ZOFLfXt3NWpQIuat4zTSlQeFUbU')
@@ -525,16 +550,16 @@ class MatchesController < ApplicationController
 	end
 
 	#Questa funzione serve per trovarmi i ruoli ancora disponibili per farli mostrare nella view
-	#mi creo prima un array con tutti i ruoli disponibili, poi mi prendo uu o pt in base al parametro type
+	#mi creo prima un array con tutti i ruoli disponibili, poi mi prendo pp o pt in base al parametro type
 	#associati a match e da quest'ultimi mi prendo tutte le relazioni gioca che mi tengono l'informazione sul ruolo di ogni
 	#giocatore. Per ogni gioca, o squadra, cancello dall'array precompilato il ruolo presente nel gioca i-esimo.
 	#alla fine mi rimane un array che contiene solo i ruoli non presenti nella relazione gioca e quindi quelli ancora
 	#disponibili da prenotare
 
 	def find_roles_left(match,type)
-		if type == "uu"
+		if type == "pp"
 			roles = ["A1","P1","C11","C12","D1","A2","P2","C21","C22","D2"]
-			match.uu.gioca.each do |g|
+			match.pp.gioca.each do |g|
 				roles.delete(g.ruolo)
 			end
 			return roles
@@ -552,11 +577,11 @@ class MatchesController < ApplicationController
 	#simile alla funzione svolta all'interno dell'azione index del medesimo controller
 
 	def find_all_matches(user)
-		matches_uu = user.uu
+		matches_pp = user.pp
 		matches_pt_s = user.pt
 		user_teams = user.team
 		matches = Array.new
-		matches_uu.each do |p|
+		matches_pp.each do |p|
 			matches.push p.match
 		end
 		matches_pt_s.each do |p|
