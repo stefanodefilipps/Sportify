@@ -13,7 +13,7 @@
           .form-group
             %label{:for => "formGroupExampleInput"} 
             = m.ruolo
-            %input#formGroupExampleInput.form-control{:placeholder => "#{m.user.nick}", :type => "text"}/
+            %input#formGroupExampleInput.form-control{:value => "#{m.user.nick}", :type => "text"}/
         .col-3
           - if (can? :remove, @team) && (m.user.id != @team.capitano.id)
             = link_to "Rimuovi utente", teams_remove_path(current_user,@team,m.user), :remote => true, method: :put, :class => "btn btn-danger mb-2", :style => "margin-top: 15%;"

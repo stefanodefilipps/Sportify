@@ -43,7 +43,9 @@ gem 'popper_js', '~> 1.11', '>= 1.11.1'
 gem 'httparty'
 gem 'geokit-rails'
 gem 'canard', '~> 0.5.0.pre'
-gem 'jquery-rails'
+gem 'rack_session_access'
+gem 'geckodriver-helper'
+gem 'selenium-webdriver', '~> 3.12'
 
 
 group :development, :test do
@@ -51,7 +53,7 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 3.12'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
 end
