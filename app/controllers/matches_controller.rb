@@ -123,8 +123,8 @@ class MatchesController < ApplicationController
 		r["results"].each do |t|
 			puts t["geometry"]["location"]["lng"]
 			puts t["geometry"]["location"]["lat"]
-			array.push {"lng"=> t["geometry"]["location"]["lng"],"lat"=> t["geometry"]["location"]["lat"],"nome" => t["name"]}
-
+			m={lng: t["geometry"]["location"]["lng"],lat: t["geometry"]["location"]["lat"],nome: t["name"]}
+			array.push m
 		end
 
 		
@@ -389,9 +389,27 @@ class MatchesController < ApplicationController
 		end
 	end
 
-	#lascia recensione
+	#lascia recensione DA TESTARE
 	def rate
-
+		t=Time.now
+        @match=Match.find_by(id: params[:match_id])
+		if(t.day>= @match.data.day && t.month >=  @match.data.month && t.year>= @match.data.month && t.hour >= (@match.ora.hour + 1))
+		    array=findplayers(@match)
+		    user=User.find_by(nick: params[:nick])
+		    if(array.include? user.id && user.id != params[:user_id])
+		    	user.voto+=params[:voto]		
+		    	user.tot+=1
+		    	user.save
+				puts "rate aggiunto correttamente"
+				redirect_to root_path
+		    else
+		    	puts "utente non gioca la tua stessa partita"
+		    	redirect_to root_path
+		    end
+		else
+			puts "l'evento non è ancora finito"
+			redirect_to root_path
+		end
 	end
     
     #salvo il match sul google calendar GOOGLE CALENDAR
@@ -572,4 +590,30 @@ class MatchesController < ApplicationController
 		end
 		return matches
 	end
+    
+    def findplayer(match)
+    	array=Array.new
+    	if(match.uu!=nil)
+    		match.uu.gioca.each do |m|
+    			array.push m.user_id
+    		end
+    	elsif(match.pt!=nil)
+    		match.pt.squadra.each do |m|
+    			array.push m.user_id
+    		end
+    		if(match.pt.team_pt!= nil)
+    			Team.find_by(id: match.team_pt.team_id).user.each do |m|
+    				array.push m.user_id
+    		    end
+    		end
+    	else
+    		match.tt.tt_team.each do |m|
+    			Team.find_by(id: m.team_id).user.each do |l|
+    			array.push l.user_id
+    			end
+    		end
+    	end	
+    	return array
+    end
+
 end

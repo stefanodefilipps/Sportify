@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   get '/users/:id/matches/:match_id/leavep', to: "matches#leaveplayer"
   get '/users/:id/matches/:match_id/destroy', to: "matches#destroy"
   post '/users/:id/matches/:match_id/endgame', to: "matches#endgame"
+  post '/users/:id/matches/:match_id/rate', to: "matches#rate"
   post 'findplaces', to: "matches#findcourts"
 
   get '/users/:id/matches/:match_id/redirect', to: 'matches#redirect', as: 'redirect'

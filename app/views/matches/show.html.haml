@@ -8,6 +8,11 @@
 					= p.ruolo
 				%li 
 					= p.user.nick
+				%form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/rate", :method => "post"}
+					%p	
+						%input{:type => "text", :name => "nick", :value => p.user.nick}/
+						%input{:type => "number", :name => "voto"}/
+						%input{:type => "submit", :value => "rate player"}/
 
 %form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/endgame", :method => "post"}
 	%p

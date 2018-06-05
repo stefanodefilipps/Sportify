@@ -8,22 +8,27 @@
 					= p.ruolo
 				%li 
 					= p.user.nick
+				%form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/rate", :method => "post"}
+					%p	
+						%input{:type => "number", :name => "nick", :value=> p.user.nick}/
+						%input{:type => "number", :name => "voto"}/
+						%input{:type => "submit", :value => "rate player"}/
 
 %form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/endgame", :method => "post"}
 	%p
 		%input{:type => "text", :name => "punt1"}/
 		%input{:type => "text", :name => "punt2"}/
-		%input{:type => "submit", :value => "endgame"}/
+		%input{:type => "submit", :value => "fine partita!"}/
 
-%form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/leave", :method => "get"}
+%form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/leavep", :method => "get"}
 	%p
-		%input{:type => "submit", :value => "leave"}/
-%form{:action => "https://localhost:3000/redirect", :method => "get"}
+		%input{:type => "submit", :value => "lascia evento"}/
+%form{:action => "https://localhost:3000/users/:id/matches/"+@m.id.to_s+"/redirect", :method => "get"}
 	%p
-		%input{:type => "submit", :value => "autentica google maps"}/
-%form{:action => "https://localhost:3000/users/1/matches/"+@m.id.to_s+"/calendar", :method => "post"}
+		%input{:type => "submit", :value => "aggiungi a google calendar"}/
+%form{:action => "https://localhost:3000/users/:id/matches/"+@m.id.to_s+"/destroy", :method => "get"}
 	%p
-		%input{:type => "submit", :value => "aggiungi al calendario"}/
+		%input{:type => "submit", :value => "distruggi evento"}/
 		
 - if @m.tipo == 2
 	- @single_players.each do |sp|
