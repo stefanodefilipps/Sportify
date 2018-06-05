@@ -1,7 +1,19 @@
 %ul.list-group
   - @array.each do |court|
     %li.list-group-item
-      .col-6
-        = @court[:nome]
-      .col-6
-        = @court[:indirizzo] 
+      .row
+        .col-6
+          = court["nome"]
+        .col-6
+          = court["address"]
+      .row
+        = form_tag "/users/#{current_user.id}/matches/new", method: "get" do
+          .form-group
+            = text_field_tag "lat",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{court["lat"]}"
+            = text_field_tag "lng",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{court["lng"]}"
+            = text_field_tag "nome",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true,:style => "display: none", value: "#{court["nome"]}"
+            %br/
+            = submit_tag "SoloVsSolo", class: "btn btn-primary"
+            = submit_tag "SquadraVsSolo", class: "btn btn-primary"
+            = submit_tag "SquadraVsSquadra", class: "btn btn-primary"
+

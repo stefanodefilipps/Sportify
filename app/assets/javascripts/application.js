@@ -19,8 +19,13 @@
 //= require_tree .
 
 $(document).ready(function() {
-	$(".show").click(function(event){
-		var id = $(this).attr("id").split(";");
-		$("#"+id[0]+"_1").load("https://localhost:3000/users/"+id[0]+"/teams/"+id[1])
-	});
+	$("button").click(function(){
+		id = $(this).attr("id");
+		nome = $("#col_"+id).text();
+		lat = $("#lat_"+id).text();
+		lng = $("#lng_"+id).text();
+		$("lat").attr("value", lat);
+		$("lng").attr("value", lng);
+		$("nome").attr("value", nome);
+	})
 })
