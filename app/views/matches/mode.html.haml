@@ -51,14 +51,18 @@
         %br/
         = form_tag "/users/#{@user.id}/teams", method: "post" do
           .form-group
-            = text_field_tag "address",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true
+            = text_field_tag "address",nil, class: "form-control", placeholder: "Inserisci nome struttura", autofocus: true
             #setbutt
               %button.btn.btn-primary{:type => "submit"} 
                 %i.fas.fa-search.fa-lg
               %br/
               %br/
               %br/
+              #court
               %br/
+              %br/
+              %br/
+
         %p{:align => "center", :style => "font-size: 20px"}
           %b Seleziona modalita:
         %br/
