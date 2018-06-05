@@ -2,10 +2,10 @@
 %html
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title utentetrovato
+    %title playSQvsSQ
     %link{:crossorigin => "anonymous", :href => "https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css", :integrity => "sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB", :rel => "stylesheet"}/
     = stylesheet_link_tag "index_team.css"
-    = stylesheet_link_tag "play.css"
+    = stylesheet_link_tag "playsquadravssolo.css"
     = stylesheet_link_tag "mostraeventi.css"
     %link{:crossorigin => "anonymous", :href =>"https://use.fontawesome.com/releases/v5.0.13/css/all.css", :integrity =>"sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp", :rel => "stylesheet"}/ 
     %link{:crossorigin => "anonymous", :href => "https://use.fontawesome.com/releases/v5.0.13/css/all.css", :integrity => "sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp", :rel => "stylesheet"}/
@@ -30,51 +30,39 @@
     %p{:align => "center", :style => "font-size:40px;"}
       %b Crea partita
     #formteam
-      = form_tag "/users/#{@user.id}/teams", method: "post" do
+      = form_tag "/users/#{@user.id}/matches", method: "post" do
         .row
           .col
             .form-group
-              = text_field_tag "P",nil, class: "form-control", placeholder: "Nickname portiere", autofocus: true
-              %br/
-              .form-group
-              = text_field_tag "D",nil, class: "form-control", placeholder: "Nickname difensore", autofocus: true
-              %br/
-              .form-group
-              = text_field_tag "C1",nil, class: "form-control", placeholder: "Nickname centrocampista 1", autofocus: true
-              %br/
-              .form-group
-              = text_field_tag "C2",nil, class: "form-control", placeholder: "Nickname centrocampista 2", autofocus: true
-              %br/
-              .form-group
-              = text_field_tag "A",nil, class: "form-control", placeholder: "Nickname attaccante", autofocus: true
+              = text_field_tag "NomeTeam",nil, class: "form-control", placeholder: "Nome squadra", autofocus: true
               %br/
               %br/
               %br/
-              .form-group
+            .form-group
               %b Data:
               = date_field_tag "data", nil, class: "form-control"
-              %br/
-              %br/
-          .col
-            .form-group
-              = text_field_tag "P",nil, class: "form-control", placeholder: "Nickname portiere", autofocus: true
-              %br/
-              .form-group
-              = text_field_tag "D",nil, class: "form-control", placeholder: "Nickname difensore", autofocus: true
-              %br/
-              .form-group
-              = text_field_tag "C1",nil, class: "form-control", placeholder: "Nickname centrocampista 1", autofocus: true
-              %br/
-              .form-group
-              = text_field_tag "C2",nil, class: "form-control", placeholder: "Nickname centrocampista 2", autofocus: true
-              %br/
-              .form-group
-              = text_field_tag "A",nil, class: "form-control", placeholder: "Nickname attaccante", autofocus: true
-              %br/
               %br/
               %br/
             .form-group
               %b Ora:
               = text_field_tag "ora", nil, class: "form-control"
+          .col
+            .form-group
+              = text_field_tag "P",nil, class: "form-control", placeholder: "Nickname portiere", autofocus: true
+              %br/
+            .form-group
+              = text_field_tag "D",nil, class: "form-control", placeholder: "Nickname difensore", autofocus: true
+              %br/
+            .form-group
+              = text_field_tag "C1",nil, class: "form-control", placeholder: "Nickname centrocampista 1", autofocus: true
+              %br/
+            .form-group
+              = text_field_tag "C2",nil, class: "form-control", placeholder: "Nickname centrocampista 2", autofocus: true
+              %br/
+            .form-group
+              = text_field_tag "A",nil, class: "form-control", placeholder: "Nickname attaccante", autofocus: true
+              %br/
+              %br/
+              %br/
           #send
-            %button.btn.btn-primary{:type => "submit"} Crea Partita
+            = submit_tag "Crea Partita", class: "btn btn-primary"

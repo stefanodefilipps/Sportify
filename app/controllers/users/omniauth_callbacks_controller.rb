@@ -12,7 +12,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       session["user_id"] = @user.id
       set_flash_message(:notice, :success, :kind => "Facebook") if is_navigational_format?
       puts "LOGIN CON SUCCESSO AVEVI GIA FATTO SIGNUP"
-      redirect_to root_path
+      redirect_to user_matches_path @user
     else
       session["devise.facebook_data"] = request.env["omniauth.auth"]
       session["uid"] = request.env["omniauth.auth"]["uid"]

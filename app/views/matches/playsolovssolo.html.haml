@@ -30,7 +30,7 @@
     %p{:align => "center", :style => "font-size:40px;"}
       %b Crea partita
     #formteam
-      = form_tag "/users/#{@user.id}/teams", method: "post" do
+      = form_tag "/users/#{@user.id}/matches", method: "post" do
         .row
           .col
             .form-group
@@ -77,4 +77,4 @@
               %b Ora:
               = text_field_tag "ora", nil, class: "form-control"
           #send
-            %button.btn.btn-primary{:type => "submit"} Crea Partita
+            = submit_tag "Crea Partita", class: "btn btn-primary"

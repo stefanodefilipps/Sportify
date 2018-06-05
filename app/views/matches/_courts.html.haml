@@ -1,0 +1,7 @@
+%ul.list-group
+  - @array.each do |court|
+    %li.list-group-item
+      .col-6
+        = @court[:nome]
+      .col-6
+        = @court[:indirizzo] 

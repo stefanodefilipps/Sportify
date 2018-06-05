@@ -40,6 +40,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
+    archive-zip (0.11.0)
+      io-like (~> 0.3.0)
     arel (8.0.0)
     autoprefixer-rails (8.5.0)
       execjs
@@ -121,6 +123,8 @@ GEM
       multipart-post (>= 1.2, < 3)
     ffi (1.9.23)
     formatador (0.2.5)
+    geckodriver-helper (0.20.2)
+      archive-zip (~> 0.7)
     geokit (1.12.0)
     geokit-rails (2.3.1)
       geokit (~> 1.5)
@@ -177,6 +181,7 @@ GEM
     httpclient (2.8.3)
     i18n (1.0.1)
       concurrent-ruby (~> 1.0)
+    io-like (0.3.0)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
@@ -251,6 +256,9 @@ GEM
     rack (2.0.5)
     rack-test (1.0.0)
       rack (>= 1.0, < 3)
+    rack_session_access (0.2.0)
+      builder (>= 2.0.0)
+      rack (>= 1.0.0)
     rails (5.1.6)
       actioncable (= 5.1.6)
       actionmailer (= 5.1.6)
@@ -384,6 +392,7 @@ DEPENDENCIES
   devise
   factory_bot_rails
   faker
+  geckodriver-helper
   geokit-rails
   google-api-client (~> 0.11)
   guard-rspec
@@ -399,10 +408,11 @@ DEPENDENCIES
   pg (>= 0.18, < 2.0)
   popper_js (~> 1.11, >= 1.11.1)
   puma (~> 3.7)
+  rack_session_access
   rails (~> 5.1.6)
   rspec-rails
   sass-rails (~> 5.0)
-  selenium-webdriver
+  selenium-webdriver (~> 3.12)
   spring
   spring-watcher-listen (~> 2.0.0)
   turbolinks (~> 5)

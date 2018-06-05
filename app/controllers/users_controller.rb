@@ -5,6 +5,10 @@ class UsersController < ApplicationController
 		 @user = User.new		#lo devo passare nella form per la create
 	end
 
+	def show
+		@user = User.find_by(id: params[:id])
+	end
+
 	#questo mi deve creare il nuovo utente dopo aver fatto il login con facebook
 	#quando clicco su sign up prima mi fa la chiamata a facebook per fare autorizzazione
 	#in seguito al consenso dato la callback attiva il metodo "facebook" in omniauth_callbacks_controller

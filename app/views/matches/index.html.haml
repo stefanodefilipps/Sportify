@@ -35,8 +35,7 @@
         %p.user_column_obj
           %b#val Valutazione:
       .container.user_column
-        %a.user_column_obj{:href => "#"}
-          %b Teams
+        = link_to "Teams", user_teams_path(current_user), :class => "user_column_obj"
       .container.user_column
         %a.user_column_obj{:href => "#"}
           %b Logout

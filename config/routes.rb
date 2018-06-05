@@ -30,6 +30,7 @@ Rails.application.routes.draw do
   put '/users/:user_id/teams/:team_id/invite', to: "teams#invite", as: "teams_invite"
   get '/notifications/:id/accept', to: "notifications#accept", as: "notifications_accept"
   get '/notifications/:id/deny', to: "notifications#deny", as: "notifications_deny"
+  get '/users/:id/matches/mode/new', to: "matches#mode", as: "new_mode_user_match"
 
 
 

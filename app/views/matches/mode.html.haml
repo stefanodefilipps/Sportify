@@ -1,0 +1,75 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title modalitadigioco
+    %link{:crossorigin => "anonymous", :href => "https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css", :integrity => "sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB", :rel => "stylesheet"}/
+    = stylesheet_link_tag "mostraeventi.css"
+    = stylesheet_link_tag "index_team.css"
+    = stylesheet_link_tag "modalitaplay.css"
+    %link{:crossorigin => "anonymous", :href => "https://use.fontawesome.com/releases/v5.0.13/css/all.css", :integrity => "sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp", :rel => "stylesheet"}/
+    %link{:href => "https://fonts.googleapis.com/css?family=Merriweather+Sans", :rel => "stylesheet"}/
+  %body{:style => "font-family: 'Merriweather Sans', sans-serif; margin-left: 0.9%; margin-right: 0.9%;"}
+    .row
+      %nav.navbar.navbar-light.barra
+        .col-3
+          .container
+            %form.form-inline
+              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search"}/
+              %button.btn.btn-outline-success.my-2.my-sm-0{:type => "submit"} Search
+        .col-3
+          %a{:href => "#"}
+            %b Profile
+        .col-3
+          %a{:href => "#"}
+            %b Play
+        .col-3
+          %a{:href => "#"}
+            %b Home
+    .row
+      .col-2.border-right{:style => "margin-left: 1.4%"}
+        .container.user_column
+          = image_tag("#{@user.img}",height: '130', width: '130', align: "center", id: "image", class: "user_column_obj")
+        .container.user_column
+          %p.user_column_obj
+            %b#nick Nickname:
+            = @user.nick
+        .container.user_column
+          %p.user_column_obj
+            %b#val Valutazione:
+            - if @user.voto != nil
+              @user.voto
+        .container.user_column
+          %a.user_column_obj{:href => "#"}
+            %b Teams
+        .container.user_column
+          %a.user_column_obj{:href => "#"}
+            %b Logout
+      #intestazione
+        %p{:align => "center", :style => "font-size: 40px"}
+          %b Cerca struttura:
+        %br/
+        = form_tag "/users/#{@user.id}/teams", method: "post" do
+          .form-group
+            = text_field_tag "address",nil, class: "form-control", placeholder: "Inserisci nome struttura", autofocus: true
+            #setbutt
+              %button.btn.btn-primary{:type => "submit"} 
+                %i.fas.fa-search.fa-lg
+              %br/
+              %br/
+              %br/
+              #court
+              %br/
+              %br/
+              %br/
+
+        %p{:align => "center", :style => "font-size: 20px"}
+          %b Seleziona modalita:
+        %br/
+        = form_tag "/users/#{@user.id}/matches/new", method: "get" do
+          .form-group
+            = text_field_tag "address",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true
+            %br/
+            = submit_tag "SoloVsSolo", class: "btn btn-primary"
+            = submit_tag "SquadraVsSolo", class: "btn btn-primary"
+            = submit_tag "SquadraVsSquadra", class: "btn btn-primary"

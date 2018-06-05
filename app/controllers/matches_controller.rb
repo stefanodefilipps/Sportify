@@ -1,7 +1,20 @@
 class MatchesController < ApplicationController
-        protect_from_forgery with: :null_session
-        
-    
+
+	def new
+		@user = User.find_by(id: params[:user_id])
+		@match = Match.new
+		if params[:commit] == "SoloVsSolo"
+			render :template => "/matches/playsolovssolo"
+			return
+		elsif params[:commit] == "SquadraVsSolo"
+			render :template => "/matches/playsquadravssolo"
+			return
+		elsif params[:commit] == "SquadraVsSquadra"
+			render :template => "/matches/playsquadravssquadra"
+			return
+		end
+		redirect_to user_matches_path current_user
+	end
 	#Questa action permette di vedere in dettaglio la partita distinta da id_match definito nella url. Prima controllo che 
 	#lo user partecipi effettivamente al match, altrimenti lo rimando su root. Se il test viene verificato allora:
 	#-Se la partita è uu mi prendo la collezione dei gioca associati a quella partita così da avere tutti gli utenti che 
@@ -13,6 +26,10 @@ class MatchesController < ApplicationController
 	#-Se la partita è tt, allora controllo se ho entrambe le squadre e di ogni squadra mi prendo le relazioni membro così da avere
 	#i giocatori che partecipano alla partita con i loro rispettivi ruoli che coincidono con quelli della loro associazione con
 	#la squadra di auuartenenza
+
+	def mode
+		@user = User.find_by(id: params[:id])
+	end
 
 	def show
 		user = User.find_by id: params[:user_id]
