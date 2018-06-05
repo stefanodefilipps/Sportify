@@ -163,8 +163,8 @@ class MatchesController < ApplicationController
 			    end
 				end
 				@match=Match.new
-		    	@match.punt1=params[:punt1]
-		    	@match.punt2=params[:punt2]
+		    	@match.punt1=0
+		    	@match.punt2=0
 		    	@match.campo=params[:campo]
 		    	@match.data=params[:data]
 		    	@match.ora=params[:ora]
@@ -244,8 +244,8 @@ class MatchesController < ApplicationController
 				end
 				
 				@match=Match.new
-		    	@match.punt1=params[:punt1]
-		    	@match.punt2=params[:punt2]
+		    	@match.punt1=0
+		    	@match.punt2=0
 		    	@match.campo=params[:campo]
 		    	@match.data=params[:data]
 		    	@match.ora=params[:ora]
@@ -296,8 +296,8 @@ class MatchesController < ApplicationController
 				end
 
                 @match=Match.new
-		    	@match.punt1=params[:punt1]
-		    	@match.punt2=params[:punt2]
+		    	@match.punt1=0
+		    	@match.punt2=0
 		    	@match.campo=params[:campo]
 		    	@match.data=params[:data]
 		    	@match.ora=params[:ora]
@@ -337,8 +337,8 @@ class MatchesController < ApplicationController
 						puts "Team A non trovato!" 
 					else
 						@match=Match.new
-		    			@match.punt1=params[:punt1]
-		    			@match.punt2=params[:punt2]
+		    			@match.punt1=0
+		    			@match.punt2=0
 		    			@match.campo=params[:campo]
 		    			@match.data=params[:data]
 		    			@match.ora=params[:ora]
@@ -466,23 +466,17 @@ class MatchesController < ApplicationController
     def leaveTeam
 		@match=Match.find_by(id: params[:match_id])
 		if(@match.pt!=nil)
-			team=Team.find_by(nome:params[:team_name])
-			if(team.capitano_id==params[:id])
-				@partita=Pts_team.find_by(team_id: team.id ,pt_id: @match.pt)
-				if(@partita!=nil) 
-					@partita.destroy
-					redirect_to root_path
-				end
+			if(@match.pt.team.capitano_id==params[:user_id])
+				@match.pt.team = nil
 			end
+			redirect_to root_path
 		else
-			team=Team.find_by(nome:params[:team_name])
-			if(team.capitano_id==params[:id])
-				@partita=Teams_tt.find_by(team_id: team.id,tt_id: @match.pt)
-				if(@partita!=nil) 
-					@partita.destroy
-					redirect_to root_path
-				end
-			end	
+			if(@match.tt.team[0].capitano_id==params[:user_id])
+				@match.tt.team[0]=nil	
+			elsif(@match.tt.team[1].capitano_id==params[:user_id])
+				@match.tt.team[1]=nil
+			end
+			redirect_to root_path	
 		end
 	end
 

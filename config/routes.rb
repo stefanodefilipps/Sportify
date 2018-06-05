@@ -22,6 +22,8 @@ Rails.application.routes.draw do
   get '/users/:id/matches/:match_id/redirect', to: 'matches#redirect', as: 'redirect'
   get '/callback', to: 'matches#callback', as: 'callback'
   
+  post '/users/:id/updateD', to: "users#updateD"
+  post '/users/:id/updateR', to: "users#updateR"
 
   get '/matches/near', to: "matches#near", as: "matches_near"
   put '/users/:user_id/teams/:id/leave', to: "teams#leave", as: "teams_leave"
