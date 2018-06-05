@@ -2,10 +2,11 @@
 %html
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title mostraeventi
+    %title indexeventi
     %link{:crossorigin => "anonymous", :href => "https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css", :integrity => "sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB", :rel => "stylesheet"}/
-    = stylesheet_link_tag "mostraeventi.css"
+    = stylesheet_link_tag "mostraeventi1.css"
     = stylesheet_link_tag "index_team.css"
+    = stylesheet_link_tag "mostraeventi.css"
     %link{:crossorigin => "anonymous", :href => "https://use.fontawesome.com/releases/v5.0.13/css/all.css", :integrity => "sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp", :rel => "stylesheet"}/
     %link{:href => "https://fonts.googleapis.com/css?family=Merriweather+Sans", :rel => "stylesheet"}/
   %body{:style => "font-family: 'Merriweather Sans', sans-serif; margin-left: 0.9%; margin-right: 0.9%;"}
@@ -20,70 +21,50 @@
           %a{:href => "#"}
             %b Profile
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}/matches/mode/new"}
             %b Play
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}/matches"}
             %b Home
-    .col-2.border-right{:style => "margin-left: 1.4%"}
-      .container.user_column
-        = image_tag("#{current_user.img}",height: '130', width: '130', align: "center", id: "image", class: "user_column_obj")
-      .container.user_column
-        %p.user_column_obj
-          %b#nick Nickname:
-      .container.user_column
-        %p.user_column_obj
-          %b#val Valutazione:
-      .container.user_column
-        = link_to "Teams", user_teams_path(current_user), :class => "user_column_obj"
-      .container.user_column
-        %a.user_column_obj{:href => "#"}
-          %b Logout
-    #container
-      %br/
-      %b Incoming
-      %br/
-      #result
-        %button#setscore Set score
-        %input#set{:min => "0", :step => "1", :type => "number"}/
-        %input#set{:min => "0", :step => "1", :type => "number"}/
-      #left
-        %input#P{:name => "giocatore1", :readonly => "readonly", :type => "text"}/
-        %br/
-        %br/
-        %input#D{:name => "giocatore2", :readonly => "readonly", :type => "text"}/
-        %br/
-        %br/
-        %input#C1{:name => "giocatore3", :readonly => "readonly", :type => "text"}/
-        %br/
-        %br/
-        %input#C2{:name => "giocatore4", :readonly => "readonly", :type => "text"}/
-        %br/
-        %br/
-        %input#A{:name => "giocatore5", :readonly => "readonly", :type => "text"}/
-      #right
-        %input#P{:name => "giocatore1", :readonly => "readonly", :type => "text"}/
-        %br/
-        %br/
-        %input#D{:name => "giocatore2", :readonly => "readonly", :type => "text"}/
-        %br/
-        %br/
-        %input#C1{:name => "giocatore3", :readonly => "readonly", :type => "text"}/
-        %br/
-        %br/
-        %input#C2{:name => "giocatore4", :readonly => "readonly", :type => "text"}/
-        %br/
-        %br/
-        %input#A{:name => "giocatore5", :readonly => "readonly", :type => "text"}/
-      #bottom
-        Data, Ora, Luogo:
-        %br/
-        %input#data{:name => "data", :readonly => "readonly", :type => "text"}/
-        %input#ora{:name => "ora", :readonly => "readonly", :type => "text"}/
-        %input#luogo{:name => "luogo", :readonly => "readonly", :type => "text"}/
-        %button#impostazioni Imp
-      #action
-        %button#google Google
-        %br/
-        %br/
-        %button#logout Logout
+    .row
+      .col-2.border-right{:style => "margin-left: 1.4%"}
+        .container.user_column
+          = image_tag("#{@user.img}",height: '130', width: '130', align: "center", id: "image", class: "user_column_obj")
+        .container.user_column
+          %p.user_column_obj
+            %b#nick Nickname:
+            = @user.nick
+        .container.user_column
+          %p.user_column_obj
+            %b#nick Nickname:
+            = @user.nick
+        .container.user_column
+          %p.user_column_obj
+            %b#val Valutazione:
+            - if @user.voto != nil
+              @user.voto
+        .container.user_column
+          %a.user_column_obj{:href => "#"}
+            %b
+              = link_to "Teams", user_teams_path(current_user)
+        .container.user_column
+          %a.user_column_obj{:href => "#"}
+            %b 
+              = link_to "Logout", logout_path, method: :delete
+      .col-7
+        - @matches.each do |m|
+          .row
+            .container
+              .card.index-teams{:style => "width: 50rem;"}
+                .card-body.prova{:id => "#{m.id}_1"}
+                  %h5.card-title Informazioni Evento
+                  %p.card-text
+                    .row
+                      .col-4
+                        = @user.nick
+                      .col-4
+                        %input#set1{:min => "0", :step => "1", :type => "number", disabled: true, value: "#{m.punt1}"}/
+                        %input#set1{:min => "0", :step => "1", :type => "number", disabled: true, value: "#{m.punt2}"}/ 
+                      .col-4
+                        %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches/#{m.id}", "data-remote" => "true"}
+                          %i.fas.fa-info-circle.fa-2x

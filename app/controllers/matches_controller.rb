@@ -37,9 +37,9 @@ class MatchesController < ApplicationController
 	end
 
 	def show
-		user = User.find_by id: params[:user_id]
+		@user = User.find_by id: params[:user_id]
 		@m = Match.find_by id: params[:id]
-		matches = find_all_matches(user)
+		matches = find_all_matches(@user)
 		if matches.count{|ma| ma.id == @m.id} == 0
 			puts "User non partecipa a questa partita"
 			redirect_to root_path
@@ -73,11 +73,10 @@ class MatchesController < ApplicationController
 	#mi prendo anche i tt a cui partecipa e quindi il match corrispondente a cui partecipa l'utente che partecipa a quella squadra
 
 	def index
-		user = User.find_by id: params[:user_id]
-		puts user
-		matches_uu = user.uu
-		matches_pt_s = user.pt
-		user_teams = user.team
+		@user = User.find_by id: params[:user_id]
+		matches_uu = @user.uu
+		matches_pt_s = @user.pt
+		@user_teams = @user.team
 		@matches = Array.new
 		matches_uu.each do |p|
 			@matches.push p.match
@@ -85,7 +84,7 @@ class MatchesController < ApplicationController
 		matches_pt_s.each do |p|
 			@matches.push p.match
 		end
-		user_teams.each do |t|
+		@user_teams.each do |t|
 			t.pt.each do |p|
 				@matches.push p.match
 			end
@@ -93,6 +92,7 @@ class MatchesController < ApplicationController
 				@matches.push tt.match
 			end
 		end
+		puts @matches
 	end
 
 	#mi arriva la get a questa route e in params ho location che viene mandata come query
@@ -166,8 +166,8 @@ class MatchesController < ApplicationController
 			    end
 				end
 				@match=Match.new
-		    	@match.punt1=0
-		    	@match.punt2=0
+		    	@match.punt1= 0
+		    	@match.punt2= 0
 		    	@match.campo=params[:campo]
 		    	@match.data=params[:data]
 		    	@match.ora=params[:ora]
@@ -178,60 +178,60 @@ class MatchesController < ApplicationController
 		    	@match.save
 		    	@uu=Uu.create(match_id: @match.id)
             	if(params[:g1]!="")
-				gioca1=Gioca.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"portiere",squadra:"a", uu_id: @uu.id)
+				gioca1=Gioca.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"P",squadra:"a", uu_id: @uu.id)
 				User.find_by(nick: params[:g1]).gioca << gioca1
 				
 			end
 		    if(params[:g2]!="")
 		      
-				gioca2=Gioca.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"difensore",squadra:"a",uu_id: @uu.id)
-				User.find_by(nick: paramsì[:g2]).gioca << gioca2	
+				gioca2=Gioca.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"D",squadra:"a",uu_id: @uu.id)
+				User.find_by(nick: params[:g2]).gioca << gioca2	
 			end
 		    if(params[:g3]!="")
 		    	
-				gioca3=Gioca.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"centro1",squadra:"a", uu_id: @uu.id)
+				gioca3=Gioca.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"C1",squadra:"a", uu_id: @uu.id)
 				User.find_by(nick: params[:g3]).gioca << gioca3
 			end
 		    if(params[:g4]!="")
 		    	
-				gioca4=Gioca.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"centro2",squadra:"a", uu_id: @uu.id)
+				gioca4=Gioca.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"C2",squadra:"a", uu_id: @uu.id)
 				User.find_by(nick: params[:g4]).gioca << gioca4   
 			end
 		    if(params[:g5]!="")
 		    	
-				gioca5=Gioca.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"attaccante",squadra:"a", uu_id: @uu.id)
+				gioca5=Gioca.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"A",squadra:"a", uu_id: @uu.id)
 				User.find_by(nick: params[:g5]).gioca << gioca5    
 			end
 		    if(params[:g6]!="")
 		    	
-				gioca6=Gioca.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"portiere",squadra:"b", uu_id: @uu.id)
+				gioca6=Gioca.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"P",squadra:"b", uu_id: @uu.id)
 				User.find_by(nick: params[:g6]).gioca << gioca6    
 			end
 		    if(params[:g7]!="")
 		    	
-				gioca7=Gioca.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"difensore",squadra:"b", uu_id: @uu.id)
+				gioca7=Gioca.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"D",squadra:"b", uu_id: @uu.id)
 				User.find_by(nick: params[:g7]).gioca << gioca7
 			end
 		    if(params[:g8]!="")
 		    	
-				gioca8=Gioca.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"centro1",squadra:"b", uu_id: @uu.id)
+				gioca8=Gioca.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"C1",squadra:"b", uu_id: @uu.id)
 				User.find_by(nick: params[:g8]).gioca << gioca8
 			end
 		    if(params[:g9]!="")
-				gioca9=Gioca.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"centro2",squadra:"b", uu_id: @uu.id)
+				gioca9=Gioca.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"C2",squadra:"b", uu_id: @uu.id)
 				User.find_by(nick: params[:g9]).gioca << gioca9
 			end
 		    if(params[:g10]!="")
 		    	
-				gioca10=Gioca.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"attaccante",squadra:"b", uu_id: @uu.id)
+				gioca10=Gioca.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"A",squadra:"b", uu_id: @uu.id)
 				User.find_by(nick: params[:g10]).gioca << gioca10
 			end
             elsif(params[:tipo]=="pt")
             	@match=Match.new
             	@pt = Pt.new
             	@pt.match = @match
-		    	@match.punt1=params[:punt1]
-		    	@match.punt2=params[:punt2]
+		    	@match.punt1=0
+		    	@match.punt2=0
 		    	@match.campo=params[:campo]
 		    	@match.data=params[:data]
 		    	@match.ora=params[:ora]
@@ -286,8 +286,8 @@ class MatchesController < ApplicationController
 						puts "Team A non trovato!" 
 					else
 						@match=Match.new
-		    			@match.punt1=params[:punt1]
-		    			@match.punt2=params[:punt2]
+		    			@match.punt1=0
+		    			@match.punt2=0
 		    			@match.campo=params[:campo]
 		    			@match.data=params[:data]
 		    			@match.ora=params[:ora]
