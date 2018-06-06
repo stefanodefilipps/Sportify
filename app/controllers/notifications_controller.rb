@@ -8,7 +8,7 @@ class NotificationsController < ApplicationController
 		@notification = Notification.find_by(id: params[:id])
 		if !@notification
 			puts "Nessuna notifica trovata"
-			redirect_to notifications_path
+			redirect_to user_path current_user
 			return
 		end
 		authorize! :accept, @notification
@@ -17,7 +17,7 @@ class NotificationsController < ApplicationController
 			if !team
 				puts "Squadra inesistente"
 				@notification.destroy
-				redirect_to notifications_path
+				redirect_to user_path current_user
 				return
 			end
 			mem = Membro.new
@@ -29,40 +29,41 @@ class NotificationsController < ApplicationController
 			rescue ActiveRecord::RecordNotUnique => e
 				puts e.message.upcase
 				@notification.destroy
-				redirect_to notifications_path
+				redirect_to user_path current_user
 				return
 			end
 			if !mem
 				puts "Non siamo riusciti ad aggiungerti alla squadra #{team.nome}"
 				@notification.destroy
-				redirect_to notifications_path
+				redirect_to user_path current_user
 			end
 			if !team.save
 				puts "Non siamo riusciti ad aggiungerti alla squadra #{team.nome}"
 				@notification.destroy
 				mem.destroy
-				redirect_to notifications_path
+				redirect_to user_path current_user
 			end
 			puts "Sei stato aggiunto alla squadra #{team.nome}"
+			@notification.destroy
 		elsif @notification.tipo == 1
 			#Qui andrà il codice per gestire l'accetazione di un utente o una squadra a un match
 			
 		end
 
 		@notification.destroy
-		redirect_to notifications_path
+		redirect_to user_path current_user
 	end
 
 	def deny
 		@notification = Notification.find_by(id: params[:id])
 		if !@notification
 			puts "Nessuna notifica trovata"
-			redirect_to notifications_path
+			redirect_to user_path current_user
 			return
 		end
 		if @notification.tipo == 2
 			@notification.destroy
-			redirect_to notifications_path
+			redirect_to user_path current_user
 		elsif @notification.tipo == 1
 			#codice per gestire un eny quando riguardano dei match
             @match=Match.find_by(id: @notification.par.match_id)
@@ -71,14 +72,14 @@ class NotificationsController < ApplicationController
 				if(@partita!=nil) 
 					@partita.destroy
 					@notification.destroy
-					redirect_to notifications_path
+					redirect_to user_path current_user
 				end
 			elsif(@match.pt!=nil)
 				@partita=Squadra.find_by(user_id: @notification.receiver_id,pt_id: @match.pt)
 				if(@partita!=nil) 
 					@partita.destroy
 					@notification.destroy
-					redirect_to notifications_path
+					redirect_to user_path current_user
 				end
 			end
 		else
@@ -86,7 +87,7 @@ class NotificationsController < ApplicationController
 			if(@match.pt!=nil)
 				@match.pt.team = nil
 				@notification.destroy
-				redirect_to notifications_path
+				redirect_to user_path current_user
 			elsif(@match.tt!=nil)
 				if(@match.tt.team[0].capitano_id==@notification.receiver_id)
 					@match.tt.team[0]=nil	
@@ -94,7 +95,7 @@ class NotificationsController < ApplicationController
 					@match.tt.team[1]=nil
 				end
 				@notification.destroy
-				redirect_to notifications_path
+				redirect_to user_path current_user
 			end
 		end
 	end

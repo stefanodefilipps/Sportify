@@ -129,11 +129,12 @@ class MatchesController < ApplicationController
 				}
 				@matches_pt = Match.within(5, :origin => coordinates).where(tipo: 2).select{|m|
 					((Date.today <=> m.data) == -1) &&
-					(m.pt.squadra.size < 5  &&
+					(m.pt.team.empty? ||
+					 m.pt.squadra.size < 5  &&
 					(m.pt.squadra.where(ruolo: current_user.ruolo1).empty? ||
 					m.pt.squadra.where(ruolo: current_user.ruolo2).empty?) &&
-					m.pt.squadra.where(user_id: current_user.id).empty?) ||
-					(m.pt.team.empty? && !m.pt.team[0].is_in_team?(current_user))
+					m.pt.squadra.where(user_id: current_user.id).empty? &&
+					!m.pt.team[0].is_in_team?(current_user))
 				}
 				@matches_tt = Match.within(5, :origin => coordinates).where(tipo: 3).select{|m| 
 					((Date.today <=> m.data) == -1) &&
@@ -416,23 +417,25 @@ class MatchesController < ApplicationController
 	#lascia recensione DA TESTARE
 	def rate
 		t=Time.now
-        @match=Match.find_by(id: params[:match_id])
-		if(t.day>= @match.data.day && t.month >=  @match.data.month && t.year>= @match.data.month && t.hour >= (@match.ora.hour + 1))
-		    array=findplayers(@match)
+		@user = User.find_by(id: params[:id])
+        @m=Match.find_by(id: params[:match_id])
+		if((t <=> @m.data) == 1)
+		    array=findplayers(@m)
+		    puts array
 		    user=User.find_by(nick: params[:nick])
-		    if(array.include? user.id && user.id != params[:user_id])
-		    	user.voto+=params[:voto]		
+		    puts user.id
+		    puts array.include? user.id
+		    puts user.id != params[:id]
+		    if((array.include? user.id) && (user.id != params[:id]))
+		    	user.voto+=params[:voto].to_f		
 		    	user.tot+=1
 		    	user.save
 				puts "rate aggiunto correttamente"
-				redirect_to root_path
 		    else
 		    	puts "utente non gioca la tua stessa partita"
-		    	redirect_to root_path
 		    end
 		else
 			puts "l'evento non è ancora finito"
-			redirect_to root_path
 		end
 	end
     
@@ -639,7 +642,7 @@ class MatchesController < ApplicationController
 		return matches
 	end
     
-    def findplayer(match)
+    def findplayers(match)
     	array=Array.new
     	if(match.uu!=nil)
     		match.uu.gioca.each do |m|
@@ -649,15 +652,15 @@ class MatchesController < ApplicationController
     		match.pt.squadra.each do |m|
     			array.push m.user_id
     		end
-    		if(match.pt.team_pt!= nil)
-    			Team.find_by(id: match.team_pt.team_id).user.each do |m|
-    				array.push m.user_id
+    		if(match.pt.team[0]!= nil)
+    			match.pt.team[0].membro.each do |m|
+    				array.push m.user.id
     		    end
     		end
     	else
-    		match.tt.tt_team.each do |m|
-    			Team.find_by(id: m.team_id).user.each do |l|
-    			array.push l.user_id
+    		match.tt.team.each do |m|
+    			m.membro.each do |l|
+    			array.push l.user.id
     			end
     		end
     	end	

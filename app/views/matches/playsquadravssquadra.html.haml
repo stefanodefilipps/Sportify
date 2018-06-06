@@ -21,6 +21,9 @@
         .col-3
           %a{:href => "/users/#{@user.id}"}
             %b Profile
+            - if @user.unread_notifications.size > 0
+              %span.badge.badge-light 
+                = @user.unread_notifications.size
         .col-3
           %a{:href => "/users/#{@user.id}/matches/mode/new"}
             %b Play

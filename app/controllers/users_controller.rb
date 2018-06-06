@@ -7,12 +7,15 @@ class UsersController < ApplicationController
 
 	def show
 		@user = User.find_by(id: params[:id])
-		if(@user.voto !=nil)
+		if(@user.voto != nil && @user.voto != 0)
 			@rate=@user.voto / @user.tot
 		else 
-			@rate="none"
+			@rate=0.to_f
 		end
 		@array=Array.new
+		@user.unread_notifications.each do |n|
+			n.update(read_at: Time.now)
+		end
 		l=Notification.where(receiver: @user.id)
 		if(l!=nil )
 		    l.each do |m|
@@ -77,9 +80,12 @@ class UsersController < ApplicationController
 			@user.ruolo1 = par["ruolo1"][0]
 			@user.ruolo2 = par["ruolo1"][1]
 		end
+		@user.voto = 0
+		@user.desc = ""
+		@user.tot = 0
 		if @user.save
 			puts "Nuovo utente creato"
-			redirect_to root_path
+			redirect_to user_matches @user
 			return
 		end
 		redirect_to root_path

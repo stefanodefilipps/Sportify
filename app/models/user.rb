@@ -43,4 +43,8 @@ class User < ApplicationRecord
 		desc == nil && nick == nil && ruolo1 == nil && ruolo2 == nil
 	end
 
+	def unread_notifications
+		return Notification.where(receiver_id: self.id, read_at: nil)
+	end
+
 end

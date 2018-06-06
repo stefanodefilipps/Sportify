@@ -2,11 +2,11 @@
   Match
   %p.card-text
     .row
+      .col-1
       .col-4
-      .col-4
-        = form_tag "/users/#{@user.id}/matches/#{@m.id}/endgame", method: "post", remote: true
+      = form_tag "/users/#{@user.id}/matches/#{@m.id}/endgame", method: "post", remote: true do
         - if (can?(:creator,@m) && ((Date.today<=>@m.data) == 1))
-          %input#set{:min => "0", :name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}"}/
+          %input#set{:min => "0",:name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}"}/
           %input#set{:min => "0",:name => "punt2", :step => "1", :type => "number", value: "#{@m.punt2}"}/
           %button.btn.btn-primary{:type => "submit"}
             %i.fas.fa-check-square.fa-2x
@@ -14,7 +14,7 @@
           %input#set{:min => "0",:name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}", readonly: "readonly" }/
           %input#set{:min => "0",:name => "punt2", :step => "1", :type => "number", value: "#{@m.punt2}", readonly: "readonly"}/
       .col-4
-        %a#google.btn.btn-outline-dark{:href => "/users/#{@user.id}/matches/#{@m.id}/redirect"}
+        %a#google.btn.btn-outline-dark{:href => "/users/#{@user.id}/matches/#{@m.id}/redirect", :style => "margin-left: 60%"}
           %i.fab.fa-google.fa-2x
     .row
       .col-6
@@ -67,15 +67,15 @@
         = @m.campo
       .col-3
     - if (Date.today<=>@m.data) == 1
-      .row{:style => "margin-top: 5%"}
-        = form_tag "/users/#{@user.id}/matches/#{@m.id}/endgame", method: "post", remote: true
-        .col-6
-          %input{:name => "giocatore", :type => "text", placeholder: "Giocatore da recensire"}/
-        .col-2
-          %input#set{:min => "0", :max => "5", :name => "voto", :step => "1", :type => "number", value: "0"}/
-        .col-2
-          %button.btn.btn-primary{:type => "submit", :style => "margin-left: 11%"}
-            %i.fas.fa-star.fa-2x
+      = form_tag "/users/#{@user.id}/matches/#{@m.id}/rate", method: "post", :remote => true do
+        .row{:style => "margin-top: 5%"}
+          .col-6
+            %input{:name => "nick", :type => "text", placeholder: "Giocatore da recensire"}/
+          .col-2
+            %input#set{:min => "0", :max => "5", :name => "voto", :step => "1", :type => "number", value: "0"}/
+          .col-2
+            %button.btn.btn-primary{:type => "submit", :style => "margin-left: 11%"}
+              %i.fas.fa-star.fa-2x
     .row{:style => "margin-top: 5%"}
       .col-8
       .col-4
@@ -84,11 +84,11 @@
           %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches"} 
             %i.fas.fa-undo.fa-2x
           - if (Date.today <=> @m.data) == -1
-            - if (can? :cattain, @m.tt.team[0]) && (@m.tt.team[0].capitano.capitano_id != @user.id)
+            - if (can? :captain, @m.tt.team[0]) && (@m.tt.team[0].capitano.capitano_id != @user.id)
               // link utile al capitano per cancellare squadra 0 da una partita
               %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches/#{@m.id}/leavet/#{@m.tt.team[0].id}", "data-method" => "post"} 
                 %i.fas.fa-sign-out-alt.fa-2x
-            - if (can? :cattain, @m.tt.team[1]) && (@m.tt.team[1].capitano.capitano_id != @user.id)
+            - if (can? :captain, @m.tt.team[1]) && (@m.tt.team[1].capitano.capitano_id != @user.id)
               // link utile al capitano per cancellare squadra 1 da una partita
               %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches/#{@m.id}/leavet/#{@m.tt.team[1].id}", "data-method" => "post"} 
                 %i.fas.fa-sign-out-alt.fa-2x
