@@ -15,17 +15,17 @@
       %nav.navbar.navbar-light.barra
         .col-3
           .container
-            %form.form-inline
-              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search"}/
+            = form_tag "/matches/near", method: :get, :class => "form-inline" do
+              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search", :name => "address"}/
               %button.btn.btn-outline-success.my-2.my-sm-0{:type => "submit"} Search
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}"}
             %b Profile
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}/matches/mode/new"}
             %b Play
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}/matches"}
             %b Home
     .container
       .row
@@ -51,35 +51,57 @@
           %br/
           %br/
           .form-group
-            = text_area_tag "bio",nil, class: "form-control", placeholder: "Inserisci informazioni su di te", :rows =>"3", autofocus: true
-            %br/
-            %button#savebutt.btn.btn-dark{:type => "submit"} Salva Informazioni
+            = form_tag "/users/#{@user.id}/updateD", method: "post" do
+              = text_area_tag "desc",nil, class: "form-control", placeholder: @user.desc, :rows =>"3", autofocus: true
+              %br/
+              %button#savebutt.btn.btn-dark{:type => "submit"} Salva Informazioni
       %hr{:width => "100%"}/
       .row
         .col
           %br/
-          %br/
-          %br/
-          %br/
           %b{:style => "font-size: 25px"} Seleziona ruoli preferiti
           %br/
-          %br/
-          .form-check.form-check-inline
-            = check_box_tag "por", nil, class: "form-check-input", autofocus:true
-            = label_tag "P", nil, class: "form-check-label", autofocus:true
-          .form-check.form-check-inline
-            = check_box_tag "dif", nil, class: "form-check-input", autofocus:true
-            = label_tag "D", nil, class: "form-check-label", autofocus:true
-          .form-check.form-check-inline
-            = check_box_tag "cen1", nil, class: "form-check-input", autofocus:true
-            = label_tag "C1", nil, class: "form-check-label", autofocus:true
-          .form-check.form-check-inline
-            = check_box_tag "cen2", nil, class: "form-check-input", autofocus:true
-            = label_tag "C2", nil, class: "form-check-label", autofocus:true
-          .form-check.form-check-inline
-            = check_box_tag "att", nil, class: "form-check-input", autofocus:true
-            = label_tag "A", nil, class: "form-check-label", autofocus:true
-          %button#savebutt.btn.btn-dark{:type => "submit"} Modifica ruoli
+          = form_tag "/users/#{@user.id}/updateR", method: "post" do
+            .form-check.form-check-inline
+              -if(@user.ruolo1=="P" || @user.ruolo2=="P")
+                = check_box_tag "P",nil,true, class: "form-check-input", autofocus:true
+                = label_tag "P", nil, class: "form-check-label", autofocus:true
+              -else
+                = check_box_tag "P",nil,false, class: "form-check-input", autofocus:true
+                = label_tag "P", nil, class: "form-check-label", autofocus:true
+            %br/
+            .form-check.form-check-inline
+              -if(@user.ruolo1=="D" || @user.ruolo2=="D")
+                = check_box_tag "D", nil,true, class: "form-check-input", autofocus:true
+                = label_tag "D", nil, class: "form-check-label", autofocus:true
+              -else
+                = check_box_tag "D", nil,false, class: "form-check-input", autofocus:true
+                = label_tag "D", nil, class: "form-check-label", autofocus:true
+            %br/
+            .form-check.form-check-inline
+              -if(@user.ruolo1=="C1" || @user.ruolo2=="C1")
+                = check_box_tag "D", nil,true, class: "form-check-input", autofocus:true
+                = label_tag "C1", nil, class: "form-check-label", autofocus:true
+              -else
+                = check_box_tag "C1", nil,false, class: "form-check-input", autofocus:true
+                = label_tag "C1", nil, class: "form-check-label", autofocus:true
+            %br/
+            .form-check.form-check-inline
+              -if(@user.ruolo1=="C2" || @user.ruolo2=="C2")
+                = check_box_tag "C2", nil,true, class: "form-check-input", autofocus:true
+                = label_tag "C2", nil, class: "form-check-label", autofocus:true
+              -else
+                = check_box_tag "C2", nil,false, class: "form-check-input", autofocus:true
+                = label_tag "C2", nil, class: "form-check-label", autofocus:true
+            %br/
+            .form-check.form-check-inline
+              -if(@user.ruolo1=="A" || @user.ruolo2=="A")
+                = check_box_tag "A", nil,true, class: "form-check-input", autofocus:true
+                = label_tag "A", nil, class: "form-check-label", autofocus:true
+              -else
+                = check_box_tag "A", nil,false, class: "form-check-input", autofocus:true
+                = label_tag "A", nil, class: "form-check-label", autofocus:true
+            %button#savebutt.btn.btn-dark{:type => "submit" } Modifica ruoli
         .col
           %br/
           %br/
@@ -88,7 +110,7 @@
           %i.far.fa-star.fa-5x
           %b{:style => "font-size: 40px"}
             Recensioni
-            %input#feedback{:disabled => "disabled", :style => "width:70px", :type => "text"}/
+            %input#feedback{:disabled => "disabled", :style => "width:70px", :type => "text", :value => @rate}/
           %br/
       %hr{:width => "100%"}/
       .row
@@ -97,7 +119,7 @@
           %br/
           %br/
           %br/
-          %button.btn.btn-outline-dark{:type => "button"}
+          %a.btn.btn-outline-dark{ :href => "/logout", "data-method" => "delete"}
             %i.fas.fa-sign-out-alt.fa-5x
         .col
           %br/
@@ -106,7 +128,30 @@
           %br/
           %i.far.fa-comments.fa-5x
           %b{:style => "font-size: 40px"} Notifiche
-        .col
+          %br/
+          %ul.list-group
+          - @array.each do |message|
+            %li.list-group-item
+              .row
+                .col-6
+                -if (message.tipo !=1)
+                  = text_field_tag "lat",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "Notifica partita:"
+                -else
+                  = text_field_tag "lat",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "Notifica squadra:"
+              .row
+              -if (message.tipo != 1)
+                =message.msg
+                = form_tag "/notifications/:#{message.id}/deny", method: "get" do
+                  %input{:type => "submit", :value => "deny"}/
+              -else
+                =message.msg
+                = form_tag "/notifications/:#{message.id}/accept", method: "get" do
+                  %input{:type => "submit", :value => "accept",class: "btn btn-primary"}/
+                = form_tag "/notifications/:#{message.id}/deny", method: "get" do
+                  %input{:type => "submit", :value => "deny",class: "btn btn-primary"}/
+
+                  
+                  
 
 
 	

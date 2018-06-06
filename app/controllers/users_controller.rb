@@ -7,6 +7,18 @@ class UsersController < ApplicationController
 
 	def show
 		@user = User.find_by(id: params[:id])
+		if(@user.voto !=nil)
+			@rate=@user.voto / @user.tot
+		else 
+			@rate="none"
+		end
+		@array=Array.new
+		l=Notification.where(receiver: @user.id)
+		if(l!=nil )
+		    l.each do |m|
+		    	@array.push m
+		    end
+		end
 	end
 
 	#questo mi deve creare il nuovo utente dopo aver fatto il login con facebook
@@ -25,21 +37,28 @@ class UsersController < ApplicationController
 	#IN SEGUITO DEVO FARE UNA REDIRECT AL CONTROLLER DEI MATCH perchè devo andare nella view che prende tutte le partite ancora da giocare o giocate dell'utente
 	
 
-	def update
-		@user=User.find_by(:id,params[:user_id])
-		if(params[:desc]!="")
-			@user.desc=params[:desc]
-			@user.save
-	    elsif(params[:ruolo1]!="" || params[:ruolo2]!= "")
-            if(params[:ruolo1]!="")
-            	@user.ruolo1=params[:ruolo1]
-			    @user.save
-            else
-            	@user.ruolo2=params[:ruolo2]
-			    @user.save
+	def updateD
+		user=User.find_by(id: params[:id])
+		user.desc=params[:desc]
+		user.save
+	    redirect_to "/users/#{user.id}"
+
+	end
+	def updateR
+		i=0
+		user=User.find_by(id: params[:id])
+		params.each do |k,v|
+			if(v=="on" && i==0)
+				user.ruolo1=k
+				user.save
+				i=1
+			elsif(v=="on" && i==1)
+				user.ruolo2=k
+				user.save
 			end
-	    end
-	    redirect_to action:"show", id: @user.id
+
+		end
+	    redirect_to "/users/#{user.id}"
 
 	end
 	

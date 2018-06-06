@@ -46,6 +46,7 @@ class NotificationsController < ApplicationController
 			puts "Sei stato aggiunto alla squadra #{team.nome}"
 		elsif @notification.tipo == 1
 			#Qui andrà il codice per gestire l'accetazione di un utente o una squadra a un match
+			
 		end
 
 		@notification.destroy
@@ -64,6 +65,38 @@ class NotificationsController < ApplicationController
 			redirect_to notifications_path
 		elsif @notification.tipo == 1
 			#codice per gestire un eny quando riguardano dei match
+            @match=Match.find_by(id: @notification.par.match_id)
+			if(@match.uu!=nil)
+			@partita=Gioca.find_by(user_id: @notification.receiver_id,uu_id: @match.uu)
+				if(@partita!=nil) 
+					@partita.destroy
+					@notification.destroy
+					redirect_to notifications_path
+				end
+			elsif(@match.pt!=nil)
+				@partita=Squadra.find_by(user_id: @notification.receiver_id,pt_id: @match.pt)
+				if(@partita!=nil) 
+					@partita.destroy
+					@notification.destroy
+					redirect_to notifications_path
+				end
+			end
+		else
+			@match=Match.find_by(id: @notification.par.match_id)
+			if(@match.pt!=nil)
+				@match.pt.team = nil
+				@notification.destroy
+				redirect_to notifications_path
+			elsif(@match.tt!=nil)
+				if(@match.tt.team[0].capitano_id==@notification.receiver_id)
+					@match.tt.team[0]=nil	
+				elsif(@match.tt.team[1].capitano_id==@notification.receiver_id)
+					@match.tt.team[1]=nil
+				end
+				@notification.destroy
+				redirect_to notifications_path
+			end
 		end
 	end
+
 end

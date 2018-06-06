@@ -16,11 +16,14 @@ Rails.application.routes.draw do
   get '/users/:id/matches/:match_id/leavep', to: "matches#leaveplayer"
   get '/users/:id/matches/:match_id/destroy', to: "matches#destroy"
   post '/users/:id/matches/:match_id/endgame', to: "matches#endgame"
+  post '/users/:id/matches/:match_id/rate', to: "matches#rate"
   post 'findplaces', to: "matches#findcourts"
 
   get '/users/:id/matches/:match_id/redirect', to: 'matches#redirect', as: 'redirect'
   get '/callback', to: 'matches#callback', as: 'callback'
   
+  post '/users/:id/updateD', to: "users#updateD"
+  post '/users/:id/updateR', to: "users#updateR"
 
   get '/matches/near', to: "matches#near", as: "matches_near"
   put '/users/:user_id/teams/:id/leave', to: "teams#leave", as: "teams_leave"
