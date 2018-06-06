@@ -1,8 +1,13 @@
 class MatchesController < ApplicationController
 
+	skip_before_action :verify_authenticity_token  
+
 	def new
 		@user = User.find_by(id: params[:user_id])
 		@match = Match.new
+		@match.lat = params[:lat].to_f
+		@match.lng = params[:lng].to_f
+		@match.campo = params[:nome]
 		if params[:commit] == "SoloVsSolo"
 			render :template => "/matches/playsolovssolo"
 			return
@@ -32,9 +37,9 @@ class MatchesController < ApplicationController
 	end
 
 	def show
-		user = User.find_by id: params[:user_id]
+		@user = User.find_by id: params[:user_id]
 		@m = Match.find_by id: params[:id]
-		matches = find_all_matches(user)
+		matches = find_all_matches(@user)
 		if matches.count{|ma| ma.id == @m.id} == 0
 			puts "User non partecipa a questa partita"
 			redirect_to root_path
@@ -68,11 +73,10 @@ class MatchesController < ApplicationController
 	#mi prendo anche i tt a cui partecipa e quindi il match corrispondente a cui partecipa l'utente che partecipa a quella squadra
 
 	def index
-		user = User.find_by id: params[:user_id]
-		puts user
-		matches_uu = user.uu
-		matches_pt_s = user.pt
-		user_teams = user.team
+		@user = User.find_by id: params[:user_id]
+		matches_uu = @user.uu
+		matches_pt_s = @user.pt
+		@user_teams = @user.team
 		@matches = Array.new
 		matches_uu.each do |p|
 			@matches.push p.match
@@ -80,7 +84,7 @@ class MatchesController < ApplicationController
 		matches_pt_s.each do |p|
 			@matches.push p.match
 		end
-		user_teams.each do |t|
+		@user_teams.each do |t|
 			t.pt.each do |p|
 				@matches.push p.match
 			end
@@ -88,6 +92,7 @@ class MatchesController < ApplicationController
 				@matches.push tt.match
 			end
 		end
+		puts @matches
 	end
 
 	#mi arriva la get a questa route e in params ho location che viene mandata come query
@@ -130,22 +135,20 @@ class MatchesController < ApplicationController
 
 	#TROVA CAMPI
 	def findcourts
-		address = params[:address]
-		city = params[:city]
+		address = params[:address].split(",")[0]
+		city = params[:address].split(",")[1]
 		coordinates = find_coordinates address, city
 		response=HTTParty.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=calcetto&location='+coordinates[0].to_s+','+coordinates[1].to_s+
       '&radius=3000&key=AIzaSyDcD5M36rW3mAStLyxu3gsjwhOwi_LmHvI')
 		r = JSON.parse response.body
-		array=Array.new
+		@array=Array.new
 		r["results"].each do |t|
+			puts t
 			puts t["geometry"]["location"]["lng"]
 			puts t["geometry"]["location"]["lat"]
-			m={lng: t["geometry"]["location"]["lng"],lat: t["geometry"]["location"]["lat"],nome: t["name"]}
-			array.push m
+			elem = {"lng" => t["geometry"]["location"]["lng"],"lat" => t["geometry"]["location"]["lat"],"nome" => t["name"], "address" => t["vicinity"]}
+			@array.push elem
 		end
-
-		
-
 	end
 
     #CREA EVENTO
@@ -156,7 +159,7 @@ class MatchesController < ApplicationController
 					if(v != "")
 			  			if(User.find_by(nick: v)==nil) 
 			  			puts "Giocatore #{k} non trovato!" 
-			  			redirect_to root_path
+			  			redirect_to user_matches_path current_user
 			  			return
 			  			end
 			  		end
@@ -175,160 +178,117 @@ class MatchesController < ApplicationController
 		    	@match.save
 		    	@uu=Uu.create(match_id: @match.id)
             	if(params[:g1]!="")
-				gioca1=Gioca.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"portiere",squadra:"a", uu_id: @uu.id)
-				User.find_by(nick: params[:g1]).gioca << gioca1
-				
+				gioca1=Gioca.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"P",squadra:"a", uu_id: @uu.id)	
+				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g1]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
 		    if(params[:g2]!="")
-		      
-				gioca2=Gioca.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"difensore",squadra:"a",uu_id: @uu.id)
-				User.find_by(nick: paramsì[:g2]).gioca << gioca2	
+				gioca2=Gioca.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"D",squadra:"a",uu_id: @uu.id)
+				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g2]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
 		    if(params[:g3]!="")
-		    	
-				gioca3=Gioca.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"centro1",squadra:"a", uu_id: @uu.id)
-				User.find_by(nick: params[:g3]).gioca << gioca3
+				gioca3=Gioca.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"C1",squadra:"a", uu_id: @uu.id)
+				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g3]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
 		    if(params[:g4]!="")
-		    	
-				gioca4=Gioca.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"centro2",squadra:"a", uu_id: @uu.id)
-				User.find_by(nick: params[:g4]).gioca << gioca4   
+				gioca4=Gioca.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"C2",squadra:"a", uu_id: @uu.id)
+			  	@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g4]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
 		    if(params[:g5]!="")
-		    	
-				gioca5=Gioca.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"attaccante",squadra:"a", uu_id: @uu.id)
-				User.find_by(nick: params[:g5]).gioca << gioca5    
+				gioca5=Gioca.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"A",squadra:"a", uu_id: @uu.id)
+				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g5]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)  
 			end
 		    if(params[:g6]!="")
-		    	
-				gioca6=Gioca.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"portiere",squadra:"b", uu_id: @uu.id)
-				User.find_by(nick: params[:g6]).gioca << gioca6    
+				gioca6=Gioca.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"P",squadra:"b", uu_id: @uu.id)
+			    @notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g6]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
 		    if(params[:g7]!="")
-		    	
-				gioca7=Gioca.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"difensore",squadra:"b", uu_id: @uu.id)
-				User.find_by(nick: params[:g7]).gioca << gioca7
+				gioca7=Gioca.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"D",squadra:"b", uu_id: @uu.id)
+				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g7]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
-		    if(params[:g8]!="")
-		    	
-				gioca8=Gioca.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"centro1",squadra:"b", uu_id: @uu.id)
-				User.find_by(nick: params[:g8]).gioca << gioca8
+		    if(params[:g8]!="")	
+				gioca8=Gioca.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"C1",squadra:"b", uu_id: @uu.id)
+				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g8]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
 		    if(params[:g9]!="")
-				gioca9=Gioca.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"centro2",squadra:"b", uu_id: @uu.id)
-				User.find_by(nick: params[:g9]).gioca << gioca9
+				gioca9=Gioca.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"C2",squadra:"b", uu_id: @uu.id)
+				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g9]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
-		    if(params[:g10]!="")
-		    	
-				gioca10=Gioca.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"attaccante",squadra:"b", uu_id: @uu.id)
-				User.find_by(nick: params[:g10]).gioca << gioca10
+		    if(params[:g10]!="")	
+				gioca10=Gioca.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"A",squadra:"b", uu_id: @uu.id)
+				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g10]).id )
+				Par.create(match_id: @match.id,notification_id: @notification.id)
 			end
             elsif(params[:tipo]=="pt")
-			if(params[:team2]!="")
-				if(Team.find_by(nome: params[:team1])==nil) 
-						puts "Team A non trovato!" 
-						redirect_to root_path
-						return
-			    end
-
-				params.each do |k,v|
-					if(k[0]=="g" && k[1]<=5)
+            	@match=Match.new
+            	@pt = Pt.new
+            	@pt.match = @match
+		    	@match.punt1=0
+		    	@match.punt2=0
+		    	@match.campo=params[:campo]
+		    	@match.data=params[:data]
+		    	@match.ora=params[:ora]
+		    	@match.lat=params[:lat]
+            	@match.lng=params[:lng]
+		    	@match.tipo=2
+		    	@match.creatore_id=params[:user_id]
+		    	params.each do |k,v|
+					if(k[0]=="g" && k[1].to_i<=5)
 						if(v != "")
 			  				if(User.find_by(nick: v)==nil) 
 			  					puts "Giocatore #{k} non trovato!" 
-			  					redirect_to root_path
+			  					redirect_to user_matches_path current_user
 			  				return
 			  			end
 			  			end
 			    	end
 				end
-				
-				@match=Match.new
-		    	@match.punt1=0
-		    	@match.punt2=0
-		    	@match.campo=params[:campo]
-		    	@match.data=params[:data]
-		    	@match.ora=params[:ora]
-		    	@match.lat=params[:lat]
-            	@match.lng=params[:lng]
-		    	@match.tipo=2
-		    	@match.creatore_id=params[:user_id]
+				if(params[:team]!="")
+					@team = Team.find_by(nome: params[:team])
+					if(@team==nil) 
+						puts "Team A non trovato!" 
+						redirect_to user_matches_path current_user
+						return
+			    	end
+			    	@team.pt << @pt
+			    	@team.save
+			    end
 		    	@match.save
-				@pt=Pt.create(match_id: @match.id)
-				Pts_team.create(pt_id:@pt.id,team_id: Team.find_by(nome: params[:team2]).id)
+				@pt.save
+				puts("CAZZO")
 				if(params[:g1]!="")
-					s1=Squadra.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"portiere",squadra:"a", pt_id: @pt.id)
-					User.find_by(nick: params[:g1]).squadra << s1
+					s1=Squadra.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"P", pt_id: @pt.id)
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g1]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id)
 				end
 		    	if(params[:g2]!="")
-					s2=Squadra.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"difensore",squadra:"a",pt_id: @pt.id)
-					User.find_by(nick: params[:g2]).squadra << s2
+					s2=Squadra.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"D",pt_id: @pt.id)
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g2]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id)
 				end
 		    	if(params[:g3]!="")
-					s3=Squadra.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"centro1",squadra:"a", pt_id: @pt.id)
-					User.find_by(nick: params[:g3]).squadra << s3
+					s3=Squadra.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"C1", pt_id: @pt.id)
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g3]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id)
 				end
 		    	if(params[:g4]!="")
-					s4=Squadra.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"centro2",squadra:"a", pt_id: @pt.id)
-					User.find_by(nick: params[:g4]).squadra << s4
+					s4=Squadra.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"C2", pt_id: @pt.id)
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g4]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id)
 				end
 		    	if(params[:g5]!="")
-					s5=Squadra.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"attaccante",squadra:"a", pt_id: @pt.id)
-					User.find_by(nick: params[:g5]).squadra << s5
+					s5=Squadra.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"A", pt_id: @pt.id)
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g5]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id)
 				end
-            else
-            	if(Team.find_by(nome: params[:team2])==nil) 
-            		puts "Team B non trovato!"
-            		redirect_to root_path 
-            		return
-		        end
-		    	
-		    	params.each do |k,v|
-					if(k[0]=="g" && k[1]>5)
-						if(v != "")
-			  			if(User.find_by(nick: v)==nil) 
-			  				puts "Giocatore #{k} non trovato!" 
-			  				redirect_to root_path
-			  				return
-			  			end
-			  		end
-			    	end
-				end
-
-                @match=Match.new
-		    	@match.punt1=0
-		    	@match.punt2=0
-		    	@match.campo=params[:campo]
-		    	@match.data=params[:data]
-		    	@match.ora=params[:ora]
-		    	@match.lat=params[:lat]
-            	@match.lng=params[:lng]
-		    	@match.tipo=2
-		    	@match.creatore_id=params[:user_id]
-		    	@match.save
-            	@pt=Pt.create(match_id: @match.id)
-		    	Pts_team.create(pt_id:@pt.id,team_id: Team.find_by(nome: params[:team1]).id)
-		    	if(params[:g6]!="")
-					s6=Squadra.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"portiere",squadra:"b", pt_id: @pt.id)
-					User.find_by(nick: params[:g6]).squadra << s6
-				end
-		    	if(params[:g7]!="")
-					s7=Squadra.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"difensore",squadra:"b", pt_id: @pt.id)
-					User.find_by(nick: params[:g7]).squadra << s7
-				end
-		    	if(params[:g8]!="")
-					s8=Squadra.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"centro1",squadra:"b", pt_id: @pt.id)
-					User.find_by(nick: params[:g8]).squadra << s8
-		    	end
-		    	if(params[:g9]!="")
-					s9=Squadra.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"centro2",squadra:"b", pt_id: @pt.id)
-					User.find_by(nick: params[:g9]).squadra << s9
-				end
-		    	if(params[:g10]!="")
-					s10=Squadra.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"attaccante",squadra:"b", pt_id: @pt.id)
-					User.find_by(nick: params[:g10]).squadra << s10
-            	end
-            end
             elsif(params[:tipo]=="tt")
 				if(Team.find_by(nome: params[:team2])==nil) 
 					flash[:notice] = "Team B non trovato!" 
@@ -348,20 +308,22 @@ class MatchesController < ApplicationController
 		    			@match.creatore_id=params[:user_id]
 		    			@match.save
 						@tt=Tt.create(match_id: @match.id)
-						Teams_tt.create(tt_id:@tt.id,team_id: Team.find_by(nome: params[:team1]).id)
-						Teams_tt.create(tt_id:@tt.id,team_id: Team.find_by(nome: params[:team2]).id)
+						t = Team.find_by(nome: params[:team1])
+						t.tt << @tt
+						t.save
+						t = Team.find_by(nome: params[:team2])
+						t.tt << @tt
+						t.save
+						@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "La tua squadra è stat invitata alla seguente partita",sender_id: params[:user_id],receiver_id:Team.find_by(nome: params[:team1]).capitano_id )
+						Par.create(match_id: @match.id,notification_id: @notification.id)
+						@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "La tua squadra è stata invitata alla seguente partita",sender_id: params[:user_id],receiver_id:Team.find_by(nome: params[:team2]).capitano_id )
+						Par.create(match_id: @match.id,notification_id: @notification.id)
 					end
             	end
         	end
 
-			redirect_to root_path
+			redirect_to user_matches_path current_user
 	end
-
-
-    #VIEW DEL CREA EVENTO
-    def new
-    end
-    
 
     #MATCHES NELLE VICINANZE
 	def near

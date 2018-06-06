@@ -34,7 +34,11 @@
         .row
           .col
             .form-group
-              = text_field_tag "NomeTeam",nil, class: "form-control", placeholder: "Nome squadra", autofocus: true
+              = text_field_tag "tipo",nil, :style => "display: none", value: "pt"
+              = text_field_tag "campo",nil, :style => "display: none", value: "#{@match.campo}"
+              = number_field_tag "lat",nil, :style => "display: none", value: "#{@match.lat}"
+              = number_field_tag "lng",nil, :style => "display: none", value: "#{@match.lng}"
+              = text_field_tag "team",nil, class: "form-control", placeholder: "Nome squadra", autofocus: true
               %br/
               %br/
               %br/
@@ -45,22 +49,22 @@
               %br/
             .form-group
               %b Ora:
-              = text_field_tag "ora", nil, class: "form-control"
+              = time_field_tag "ora", nil, class: "form-control"
           .col
             .form-group
-              = text_field_tag "P",nil, class: "form-control", placeholder: "Nickname portiere", autofocus: true
+              = text_field_tag "g1",nil, class: "form-control", placeholder: "Nickname portiere", autofocus: true
               %br/
             .form-group
-              = text_field_tag "D",nil, class: "form-control", placeholder: "Nickname difensore", autofocus: true
+              = text_field_tag "g2",nil, class: "form-control", placeholder: "Nickname difensore", autofocus: true
               %br/
             .form-group
-              = text_field_tag "C1",nil, class: "form-control", placeholder: "Nickname centrocampista 1", autofocus: true
+              = text_field_tag "g3",nil, class: "form-control", placeholder: "Nickname centrocampista 1", autofocus: true
               %br/
             .form-group
-              = text_field_tag "C2",nil, class: "form-control", placeholder: "Nickname centrocampista 2", autofocus: true
+              = text_field_tag "g4",nil, class: "form-control", placeholder: "Nickname centrocampista 2", autofocus: true
               %br/
             .form-group
-              = text_field_tag "A",nil, class: "form-control", placeholder: "Nickname attaccante", autofocus: true
+              = text_field_tag "g5",nil, class: "form-control", placeholder: "Nickname attaccante", autofocus: true
               %br/
               %br/
               %br/

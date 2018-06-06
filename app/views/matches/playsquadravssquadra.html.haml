@@ -34,7 +34,11 @@
         .row
           .col
             .form-group
-              = text_field_tag "NomeTeam",nil, class: "form-control", placeholder: "Nome squadra", autofocus: true
+              = text_field_tag "tipo",nil, :style => "display: none", value: "tt"
+              = text_field_tag "campo",nil, :style => "display: none", value: "#{@match.campo}"
+              = number_field_tag "lat",nil, :style => "display: none", value: "#{@match.lat}"
+              = number_field_tag "lng",nil, :style => "display: none", value: "#{@match.lng}"
+              = text_field_tag "team1",nil, class: "form-control", placeholder: "Nome squadra", autofocus: true
               %br/
               %br/
               %br/
@@ -45,13 +49,13 @@
               %br/
           .col
             .form-group
-              = text_field_tag "NomeTeam",nil, class: "form-control", placeholder: "Nome squadra", autofocus: true
+              = text_field_tag "team2",nil, class: "form-control", placeholder: "Nome squadra", autofocus: true
               %br/
               %br/
               %br/
             .form-group
               %b Ora:
-              = text_field_tag "ora", nil, class: "form-control"
+              = time_field_tag "ora", nil, class: "form-control"
 
           #send
             = submit_tag "Crea Partita", class: "btn btn-primary"

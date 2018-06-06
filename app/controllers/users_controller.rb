@@ -12,6 +12,13 @@ class UsersController < ApplicationController
 		else 
 			@rate="none"
 		end
+		@array=Array.new
+		l=Notification.where(receiver: @user.id)
+		if(l!=nil )
+		    l.each do |m|
+		    	@array.push m
+		    end
+		end
 	end
 
 	#questo mi deve creare il nuovo utente dopo aver fatto il login con facebook

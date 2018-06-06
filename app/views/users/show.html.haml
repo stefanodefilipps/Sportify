@@ -128,7 +128,30 @@
           %br/
           %i.far.fa-comments.fa-5x
           %b{:style => "font-size: 40px"} Notifiche
-        .col
+          %br/
+          %ul.list-group
+          - @array.each do |message|
+            %li.list-group-item
+              .row
+                .col-6
+                -if (message.tipo !=1)
+                  = text_field_tag "lat",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "Notifica partita:"
+                -else
+                  = text_field_tag "lat",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "Notifica squadra:"
+              .row
+              -if (message.tipo != 1)
+                =message.msg
+                = form_tag "/notifications/:#{message.id}/deny", method: "get" do
+                  %input{:type => "submit", :value => "deny"}/
+              -else
+                =message.msg
+                = form_tag "/notifications/:#{message.id}/accept", method: "get" do
+                  %input{:type => "submit", :value => "accept",class: "btn btn-primary"}/
+                = form_tag "/notifications/:#{message.id}/deny", method: "get" do
+                  %input{:type => "submit", :value => "deny",class: "btn btn-primary"}/
+
+                  
+                  
 
 
 	

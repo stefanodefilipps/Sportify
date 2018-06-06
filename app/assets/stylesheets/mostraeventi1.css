@@ -1,0 +1,27 @@
+#container1{
+	top: 100px;
+	right: 380px;
+	width: 600px;
+	height: 150px;
+	border:2px black solid;
+	border-radius: 5px;
+}
+
+#set1{
+	width: 50px;
+	height: 70px;
+	font-size: 20px;
+}
+
+#result1{
+	left: 350px;
+}
+
+#nomecreatore1{
+	top: 80px;
+}
+
+#button1{
+	top: 60px;
+	right: 40px;
+}
