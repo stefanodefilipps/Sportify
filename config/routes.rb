@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   post 'login', to: "sessions#create"
   delete 'logout', to: "sessions#destroy"
 
-  post '/users/:id/matches/:match_id/leavet', to: "matches#leaveteam"
+  post '/users/:id/matches/:match_id/leavet/:team_id', to: "matches#leaveteam"
   get '/users/:id/matches/:match_id/leavep', to: "matches#leaveplayer"
   get '/users/:id/matches/:match_id/destroy', to: "matches#destroy"
   post '/users/:id/matches/:match_id/endgame', to: "matches#endgame"
@@ -30,6 +30,8 @@ Rails.application.routes.draw do
   get '/notifications/:id/accept', to: "notifications#accept", as: "notifications_accept"
   get '/notifications/:id/deny', to: "notifications#deny", as: "notifications_deny"
   get '/users/:id/matches/mode/new', to: "matches#mode", as: "new_mode_user_match"
+  put '/users/:id/matches/:match_id/deleteplayer/:user_id_2', to: "matches#deleteplayer", as: "matches_delete_player"
+  put '/users/:id/matches/:match_id/deleteteam/:team_id', to: "matches#deleteteam", as: "matches_delete_team"
 
 
 

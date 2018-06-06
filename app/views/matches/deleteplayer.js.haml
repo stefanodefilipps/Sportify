@@ -1,0 +1,4 @@
+- if @m.tipo == 1
+	$("##{@m.id}_1").html("#{j(render("showsolovssolo"))}")
+- else @m.tipo == 2
+	$("##{@m.id}_1").html("#{j(render("showsquadravssolo"))}")

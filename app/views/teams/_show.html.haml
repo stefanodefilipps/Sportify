@@ -24,15 +24,24 @@
             = link_to "Passa Capitano", teams_captain_path(current_user,@team,m.user), :remote => true, method: :put, :class => "btn btn-primary mb-2", :style => "margin-top: 15%;"
     -if (can? :invite, @team)
       -@team.roles_left.each do |r|
-        .row
-          .col-6
-            %label.sr-only{:for => "formGroupExampleInput", :class => ""} 
-            = r
-        .row
-          .col-12
-            = form_tag "https://localhost:3000/users/#{current_user.id}/teams/#{@team.id}/invite", method: "put", remote: true, :class => "form-inline" do
-              = text_field_tag "#{r}",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Nome utente", autofocus: true, :style => "width: 48%"
-              = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
+        - if @team.is_waiting_response_for_role(@user,r)
+          .row
+            .col-6
+              %label.sr-only{:for => "formGroupExampleInput", :class => ""} 
+              = r
+          .row
+            .col-12
+              = text_field_tag "#{r}",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Waiting for a response", autofocus: true, :style => "width: 48%", :disabled => "true"
+        - else
+          .row
+            .col-6
+              %label.sr-only{:for => "formGroupExampleInput", :class => ""} 
+              = r
+          .row
+            .col-12
+              = form_tag "https://localhost:3000/users/#{current_user.id}/teams/#{@team.id}/invite", method: "put", remote: true, :class => "form-inline" do
+                = text_field_tag "#{r}",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Nome utente", autofocus: true, :style => "width: 48%"
+                = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
     .row{:style => "margin-top: 4%;"}
       .col-6
         = link_to "Back", user_teams_path(current_user), :class => "btn btn-primary mb-2"

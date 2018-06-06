@@ -13,7 +13,8 @@
             = text_field_tag "lng",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{court["lng"]}"
             = text_field_tag "nome",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true,:style => "display: none", value: "#{court["nome"]}"
             %br/
-            = submit_tag "SoloVsSolo", class: "btn btn-primary"
-            = submit_tag "SquadraVsSolo", class: "btn btn-primary"
-            = submit_tag "SquadraVsSquadra", class: "btn btn-primary"
+            .container{:style => "margin-left: 2%"}
+              = submit_tag "SoloVsSolo", class: "btn btn-primary"
+              = submit_tag "SquadraVsSolo", class: "btn btn-primary"
+              = submit_tag "SquadraVsSquadra", class: "btn btn-primary"
 

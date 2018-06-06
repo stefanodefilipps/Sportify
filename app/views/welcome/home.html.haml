@@ -27,11 +27,11 @@
       #form.row.align-items-center
         .col
         .col
-          %form
-            #center.row.align-items-center
+          #center.row.align-items-center
+            = form_tag "/matches/near", method: :get, :class => "form-inline" do
               .col
               .col
-                %input#inputtext.form-input{:placeholder => "Cerca partita...", :type => "text"}/
+                %input#inputtext.form-input{:placeholder => "Cerca partita...", :type => "text", :name => "address"}/
               .col
                 %button.btn.btn-primary.mb-2{:type => "submit"} Cerca
         .col

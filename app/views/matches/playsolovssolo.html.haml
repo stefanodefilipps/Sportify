@@ -15,17 +15,17 @@
       %nav.navbar.navbar-light.barra
         .col-3
           .container
-            %form.form-inline
-              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search"}/
+            = form_tag "/matches/near", method: :get, :class => "form-inline" do
+              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search", :name => "address"}/
               %button.btn.btn-outline-success.my-2.my-sm-0{:type => "submit"} Search
         .col-3
           %a{:href => "#"}
             %b Profile
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}/matches/mode/new"}
             %b Play
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}/matches"}
             %b Home
     %p{:align => "center", :style => "font-size:40px;"}
       %b Crea partita

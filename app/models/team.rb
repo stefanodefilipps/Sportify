@@ -14,6 +14,22 @@ class Team < ApplicationRecord
 		return roles
 	end
 
+	def is_in_team?(user)
+		self.membro.each do |m|
+			if m.user.id == user.id
+				return true
+			end
+		end
+		return false
+	end
+
+	#Questo metodo mi serve solo per sapere se alcuni ruoli sono in attesa di risposta da una notifica per team
+
+	def is_waiting_response_for_role(user,role)
+		n = Sq.where(team_id: self.id, ruolo: role)
+		return !n.empty?
+	end
+
 	private 
 
 	def in_range

@@ -42,17 +42,17 @@ class MatchesController < ApplicationController
 		matches = find_all_matches(@user)
 		if matches.count{|ma| ma.id == @m.id} == 0
 			puts "User non partecipa a questa partita"
-			redirect_to root_path
+			redirect_to user_matches_path current_user
 		end
 		if @m.tipo == 1
 			@players = @m.uu.gioca
 		elsif @m.tipo == 2
 			@single_players = @m.pt.squadra
-			if m.pt.team != nil
-				@team_players = @m.pt.team.membro
+			if @m.pt.team[0] != nil
+				@team_players = @m.pt.team[0].membro
 			end
 		elsif @m.tipo == 3
-			if m.tt.team.size == 1
+			if @m.tt.team.size == 1
 				@players_team_1 = @m.tt.team[0].membro
 			else
 				@players_team_1 = @m.tt.team[0].membro
@@ -111,23 +111,66 @@ class MatchesController < ApplicationController
 
 	def near
 
-		address = params[:address]
-		city = params[:city]
+		address = params[:address].split(",")[0]
+		city = params[:address].split(",")[1]
 		coordinates = find_coordinates address, city
 		if coordinates.length == 1
 			puts coordinates[0]
 			redirect_to root_path
 		else
-			@matches_uu = Match.within(5, :origin => coordinates).joins(uu: :gioca).group("uus.id,matches.id").having("count(uus.id) < 10").select("uus.*, matches.*")
-			@matches_pt = Match.within(5, :origin => coordinates).joins(pt: [:squadra, :team]).group("pts.id,matches.id").having("count(pts.id) < 6").select("pts.*, matches.*")
-			@matches_tt = Match.within(5, :origin => coordinates).joins(tt: :team).group("tts.id,matches.id").having("count(tts.id) < 2").select("tts.*, matches.*")
-			@roles_left_uu = Hash.new
-			@matches_uu.each do |m_uu|
-				@roles_left_uu["#{m_uu.id}"] = find_roles_left(m_uu,"uu")
-			end
-			@roles_left_pt = Hash.new
-			@matches_pt.each do |m_pt|
-				@roles_left_pt["#{m_uu.id}"] = find_roles_left(m_pt,"pt")
+			if logged_in?
+				@matches_uu = Match.within(5, :origin => coordinates).where(tipo: 1).select{|m|
+					((Date.today <=> m.data) == -1) &&
+					m.uu.gioca.size < 10 &&
+					(m.uu.gioca.where(ruolo: current_user.ruolo1).empty? ||
+					m.uu.gioca.where(ruolo: current_user.ruolo2).empty?) &&
+					m.uu.gioca.where(user_id: current_user.id).empty? &&
+					m.uu.gioca.where(user_id: current_user.id).empty?
+				}
+				@matches_pt = Match.within(5, :origin => coordinates).where(tipo: 2).select{|m|
+					((Date.today <=> m.data) == -1) &&
+					(m.pt.squadra.size < 5  &&
+					(m.pt.squadra.where(ruolo: current_user.ruolo1).empty? ||
+					m.pt.squadra.where(ruolo: current_user.ruolo2).empty?) &&
+					m.pt.squadra.where(user_id: current_user.id).empty?) ||
+					(m.pt.team.empty? && !m.pt.team[0].is_in_team?(current_user))
+				}
+				@matches_tt = Match.within(5, :origin => coordinates).where(tipo: 3).select{|m| 
+					((Date.today <=> m.data) == -1) &&
+					(m.tt.team[0] != nil && !m.tt.team[0].is_in_team?(current_user)) ||
+					(m.tt.team[1] != nil && !m.tt.team[1].is_in_team?(current_user))
+				}
+				@roles_left_uu = Hash.new
+				@matches_uu.each do |m_uu|
+					@roles_left_uu["#{m_uu.id}"] = find_roles_left(m_uu).select{|r| r[1] == current_user.ruolo1 || r[1] == current_user.ruolo2}
+				end
+				@roles_left_pt = Hash.new
+				@matches_pt.each do |m_pt|
+					@roles_left_pt["#{m_pt.id}"] = find_roles_left(m_pt).select{|r| r == current_user.ruolo1 || r == current_user.ruolo2}
+				end
+			else
+				@matches_uu = Match.within(5, :origin => coordinates).where(tipo: 1).select{|m|
+					(Date.today <=> m.data) == -1 &&
+					m.uu.gioca.size < 10
+				}
+				@matches_pt = Match.within(5, :origin => coordinates).where(tipo: 2).select{|m|
+					(Date.today <=> m.data) == -1 &&
+					(m.pt.squadra.size < 5 ||
+					 m.pt.team.empty?)
+				}
+				@matches_tt = Match.within(5, :origin => coordinates).where(tipo: 3).select{|m| 
+					(Date.today <=> m.data) == -1 &&
+					(m.tt.team[0] != nil) ||
+					(m.tt.team[1] != nil)
+				}
+				@roles_left_uu = Hash.new
+				@matches_uu.each do |m_uu|
+					@roles_left_uu["#{m_uu.id}"] = find_roles_left(m_uu)
+				end
+				@roles_left_pt = Hash.new
+				@matches_pt.each do |m_pt|
+					@roles_left_pt["#{m_pt.id}"] = find_roles_left(m_pt)
+				end
 			end
 		end
 		
@@ -262,7 +305,6 @@ class MatchesController < ApplicationController
 			    end
 		    	@match.save
 				@pt.save
-				puts("CAZZO")
 				if(params[:g1]!="")
 					s1=Squadra.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"P", pt_id: @pt.id)
 				end
@@ -279,77 +321,80 @@ class MatchesController < ApplicationController
 					s5=Squadra.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"A", pt_id: @pt.id)
 				end
             elsif(params[:tipo]=="tt")
-				if(Team.find_by(nome: params[:team2])==nil) 
-					flash[:notice] = "Team B non trovato!" 
-				else
-					if(Team.find_by(nome: params[:team1])==nil) 
+            	@match=Match.new
+    			@match.punt1=0
+    			@match.punt2=0
+    			@match.campo=params[:campo]
+    			@match.data=params[:data]
+    			@match.ora=params[:ora]
+    			@match.lat=params[:lat]
+    			@match.lng=params[:lng]
+    			@match.tipo=3
+    			@match.creatore_id=params[:user_id]
+    			@match.save
+            	if params[:team2] == ""
+            		if(Team.find_by(nome: params[:team1])==nil) 
 						puts "Team A non trovato!" 
+						redirect_to user_matches_path current_user
+						return
 					else
-						@match=Match.new
-		    			@match.punt1=0
-		    			@match.punt2=0
-		    			@match.campo=params[:campo]
-		    			@match.data=params[:data]
-		    			@match.ora=params[:ora]
-		    			@match.lat=params[:lat]
-            			@match.lng=params[:lng]
-		    			@match.tipo=3
-		    			@match.creatore_id=params[:user_id]
-		    			@match.save
 						@tt=Tt.create(match_id: @match.id)
 						t = Team.find_by(nome: params[:team1])
 						t.tt << @tt
 						t.save
+					end
+            	elsif params[:team1] == ""
+            		if(Team.find_by(nome: params[:team2])==nil) 
+						puts "Team B non trovato!" 
+						redirect_to user_matches_path current_user
+						return
+					else
+						@tt=Tt.create(match_id: @match.id)
 						t = Team.find_by(nome: params[:team2])
 						t.tt << @tt
 						t.save
 					end
+            	else
+            		if(Team.find_by(nome: params[:team2])==nil) 
+						flash[:notice] = "Team B non trovato!" 
+						redirect_to user_matches_path current_user
+						return
+					else
+						if(Team.find_by(nome: params[:team1])==nil) 
+							puts "Team A non trovato!" 
+							redirect_to user_matches_path current_user
+							return
+						else
+							@tt=Tt.create(match_id: @match.id)
+							t = Team.find_by(nome: params[:team1])
+							t.tt << @tt
+							t.save
+							t = Team.find_by(nome: params[:team2])
+							t.tt << @tt
+							t.save
+						end
+            		end
             	end
         	end
-
+        	user = User.find_by(id: params[:user_id])
+        	user.roles << :match_creator
+        	user.save
 			redirect_to user_matches_path current_user
-	end
-
-    #MATCHES NELLE VICINANZE
-	def near
-
-		address = params[:address]
-		city = params[:city]
-		coordinates = find_coordinates address, city
-		if coordinates.length == 1
-			puts coordinates[0]
-			redirect_to root_path
-		else
-			@matches_uu = Match.within(5, :origin => coordinates).joins(uu: :gioca).group("uus.id,matches.id").having("count(uus.id) < 10").select("uus.*, matches.*")
-			@matches_pt = Match.within(5, :origin => coordinates).joins(pt: [:squadra, :team]).group("pts.id,matches.id").having("count(pts.id) < 6").select("pts.*, matches.*")
-			@matches_tt = Match.within(5, :origin => coordinates).joins(tt: :team).group("tts.id,matches.id").having("count(tts.id) < 2").select("tts.*, matches.*")
-
-			@roles_left_uu = Hash.new
-			@matches_uu.each do |m_uu|
-				@roles_left_uu["#{m_uu.id}"] = find_roles_left(m_uu,"uu")
-			end
-			@roles_left_pt = Hash.new
-			@matches_pt.each do |m_pt|
-				@roles_left_pt["#{m_uu.id}"] = find_roles_left(m_pt,"pt")
-			end
-		end
-
 	end
 	
     
     #definire il punteggio a fine partita
 	def endgame
 		t=Time.now
-        @match=Match.find_by(id: params[:match_id])
-		if(t.day>= @match.data.day && t.month >=  @match.data.month && t.year>= @match.data.month && t.hour >= (@match.ora.hour + 1))
-			@match.punt1=params[:punt1]
-			@match.punt2=params[:punt2]
-			@match.save
+		@user=User.find_by(id: params[:id])
+        @m=Match.find_by(id: params[:match_id])
+		if((t<=>@m.data) == 1)
+			@m.punt1=params[:punt1]
+			@m.punt2=params[:punt2]
+			@m.save
 			puts "chiuso correttamente"
-			redirect_to root_path
 		else
 			puts "non è ancora finito"
-			redirect_to root_path
 		end
 	end
 
@@ -386,33 +431,22 @@ class MatchesController < ApplicationController
     })
     service.insert_event("primary", event)
 
-    redirect_to root_path
+    redirect_to user_matches_path current_user
 
     end
 
     
     #abbandona evento come squadra
-    def leaveTeam
+    def leaveteam
 		@match=Match.find_by(id: params[:match_id])
+		team=Team.find_by(id:params[:team_id])
+		authorize! :captain, team
 		if(@match.pt!=nil)
-			team=Team.find_by(nome:params[:team_name])
-			if(team.capitano_id==params[:id])
-				@partita=Pts_team.find_by(team_id: team.id ,pt_id: @match.pt)
-				if(@partita!=nil) 
-					@partita.destroy
-					redirect_to root_path
-				end
-			end
+			@match.pt.team = []
 		else
-			team=Team.find_by(nome:params[:team_name])
-			if(team.capitano_id==params[:id])
-				@partita=Teams_tt.find_by(team_id: team.id,tt_id: @match.pt)
-				if(@partita!=nil) 
-					@partita.destroy
-					redirect_to root_path
-				end
-			end	
+			@match.tt.team = @match.tt.team.where("id != #{team.id}")
 		end
+		redirect_to user_matches_path current_user
 	end
 
 	#abbandona evento come player
@@ -422,22 +456,47 @@ class MatchesController < ApplicationController
 			@partita=Gioca.find_by(user_id: params[:id],uu_id: @match.uu)
 			if(@partita!=nil) 
 				@partita.destroy
-				redirect_to root_path
+				redirect_to user_matches_path current_user
 			end
 		else
 			@partita=Squadra.find_by(user_id: params[:user_id],pt_id: @match.pt)
 			if(@partita!=nil) 
 				@partita.destroy
-				redirect_to root_path
+				redirect_to user_matches_path current_user
 			end
+		end
+		redirect_to user_matches_path current_user
+	end
+
+	def deleteplayer
+		@user = User.find_by(id: params[:id])
+		@user_2 = User.find_by(id: params[:user_id_2])
+		@m = Match.find_by(id: params[:match_id])
+		authorize! :deleteplayer, @m
+		if @m.tipo == 1
+			gioca = @m.uu.gioca.where(user_id: @user_2.id)[0].destroy
+		else
+			@m.pt.squadra.where(user_id: @user_2.id)[0].destroy
+		end
+	end
+
+	def deleteteam
+		@user = User.find_by(id: params[:id])
+		@m = Match.find_by(id: params[:match_id])
+		team = Team.find_by(id: params[:team_id])
+		authorize! :deleteteam, @m
+		if(@m.pt!=nil)
+			@m.pt.team = []
+		else
+			@m.tt.team = @m.tt.team.where("id != #{team.id}")
 		end
 	end
 
 	#cancella partita
 	def destroy
-		@match=Match.find_by(id: params[:match_id])
+		@match=Match.find_by(id: params[:id])
 		@match.destroy
-		redirect_to root_path
+		redirect_to user_matches_path current_user
 	end
 
 	private
@@ -495,15 +554,25 @@ class MatchesController < ApplicationController
 	#alla fine mi rimane un array che contiene solo i ruoli non presenti nella relazione gioca e quindi quelli ancora
 	#disponibili da prenotare
 
-	def find_roles_left(match,type)
-		if type == "uu"
-			roles = ["A1","P1","C11","C12","D1","A2","P2","C21","C22","D2"]
-			match.uu.gioca.each do |g|
-				roles.delete(g.ruolo)
+	def find_roles_left(match)
+		if match.tipo == 1
+			roles = []
+			allowed_roles = ["A","P","C1","C2","D"]
+			(0..4).each do |i|
+				roles.push "a#{allowed_roles[i]}"
 			end
+			(0..4).each do |i|
+				roles.push "b#{allowed_roles[i]}"
+			end
+			puts roles
+			match.uu.gioca.each do |g|
+				puts g.ruolo
+				roles.delete_if{|x| x == "#{g.squadra}#{g.ruolo}"}
+			end
+			puts roles
 			return roles
 		end
-		if type == 'pt'
+		if match.tipo == 2
 			roles = ["A","P","C1","C2","D"]
 			match.pt.squadra.each do |g|
 				roles.delete(g.ruolo)

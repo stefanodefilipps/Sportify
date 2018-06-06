@@ -125,7 +125,7 @@ class TeamsController < ApplicationController
 			return		
 		end
 		if @user != current_user
-			redirect_to user_teams_path(current_user.id)
+			redirect_to user_teams_path(current_user)
 			return
 		end
 		if !@user
@@ -344,7 +344,7 @@ class TeamsController < ApplicationController
 		notifica.msg = "#{@team.capitano.nick} ti ha invitato a partecipare alla squadra #{@team.nome}"
 		notifica.tipo = 2
 		if !notifica.save
-			puts "Impossibile invitare #{player.nick}"
+			puts "Impossibile invitare #{@new_member.nick}"
 			return
 		else
 			notifica_squadra = Sq.new
@@ -352,11 +352,11 @@ class TeamsController < ApplicationController
 			notifica_squadra.team = @team
 			notifica_squadra.ruolo = ruolo
 			if !notifica_squadra.save
-				puts "Impossibile invitare #{player.nick}"
+				puts "Impossibile invitare #{@new_member.nick}"
 				notifica.destroy
 				return
 			else
-				puts "Giocatore #{player.nick} invitato alla squadra"
+				puts "Giocatore #{@new_member.nick} invitato alla squadra"
 				return
 			end
 		end

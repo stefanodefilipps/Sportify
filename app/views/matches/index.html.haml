@@ -14,8 +14,8 @@
       %nav.navbar.navbar-light.barra
         .col-3
           .container
-            %form.form-inline
-              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search"}/
+            = form_tag "/matches/near", method: :get, :class => "form-inline" do
+              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search", :name => "address"}/
               %button.btn.btn-outline-success.my-2.my-sm-0{:type => "submit"} Search
         .col-3
           %a{:href => "#"}
@@ -36,17 +36,13 @@
             = @user.nick
         .container.user_column
           %p.user_column_obj
-            %b#nick Nickname:
-            = @user.nick
-        .container.user_column
-          %p.user_column_obj
             %b#val Valutazione:
             - if @user.voto != nil
               @user.voto
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b
-              = link_to "Teams", user_teams_path(current_user)
+              = link_to "Teams", user_teams_path(@user)
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b 
@@ -61,7 +57,7 @@
                   %p.card-text
                     .row
                       .col-4
-                        = @user.nick
+                        = m.creatore.nick
                       .col-4
                         %input#set1{:min => "0", :step => "1", :type => "number", disabled: true, value: "#{m.punt1}"}/
                         %input#set1{:min => "0", :step => "1", :type => "number", disabled: true, value: "#{m.punt2}"}/ 

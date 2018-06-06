@@ -1,0 +1,4 @@
+- if @m.tipo == 2
+	$("##{@m.id}_1").html("#{j(render("showsquadravssolo"))}")
+- elsif @m.tipo == 3
+	$("##{@m.id}_1").html("#{j(render("showsquadravssquadra"))}")

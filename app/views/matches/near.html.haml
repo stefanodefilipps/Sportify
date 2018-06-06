@@ -14,52 +14,138 @@
       %nav.navbar.navbar-light.barra
         .col-3
           .container
-            %form.form-inline
-              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search"}/
+            = form_tag "/matches/near", method: :get, :class => "form-inline" do
+              %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search", :name => "address"}/
               %button.btn.btn-outline-success.my-2.my-sm-0{:type => "submit"} Search
-        .col-3
-          %a{:href => "#"}
-            %b Profile
-        .col-3
-          %a{:href => "#"}
-            %b Play
-        .col-3
-          %a{:href => "#"}
-            %b Home
-    #maps
-      %iframe{:allowfullscreen => "", :frameborder => "0", :height => "500", :src => "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d23754.43534331145!2d12.513070676217678!3d41.9078141916421!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132f6196f9928ebb%3A0xb90f770693656e38!2sRoma+RM!5e0!3m2!1sit!2sit!4v1526561360448", :style => "border:0", :width => "600"}
-    #partite
-      %p
-        %b Partite Trovate
-      #return
-        %label Nome Evento:
-        %br/
-        %input#partita{:readonly => "readonly"}/
-        %br/
-        %br/
-        %label Data,Ora,Luogo:
-        %br/
-        %input#data{:readonly => "readonly", :type => "date"}/
-        %input#ora{:readonly => "readonly"}/
-        %input#dove{:readonly => "readonly"}/
-        %br/
-        %br/
-        %div
-          %label
-            %b Ruoli disponibili:
-          %br/
-          %input#P{:disabled => "disabled", :type => "checkbox"}/
-          %label{:for => "P"} P
-          %br/
-          %input#D{:disabled => "disabled", :type => "checkbox"}/
-          %label{:for => "D"} D
-          %br/
-          %input#C1{:disabled => "disabled", :type => "checkbox"}/
-          %label{:for => "C1"} C1
-          %br/
-          %input#C2{:disabled => "disabled", :type => "checkbox"}/
-          %label{:for => "C2"} C2
-          %br/
-          %input#A{:disabled => "disabled", :type => "checkbox"}/
-          %label{:for => "A"} A
-          %br/
+        - if logged_in?
+          .col-3
+            %a{:href => "#"}
+              %b Profile
+          .col-3
+            %a{:href => "/users/#{current_user.id}/matches/mode/new"}
+              %b Play
+          .col-3
+            %a{:href => "/users/#{current_user.id}/matches"}
+              %b Home
+      .col-6
+        .row
+          - @matches_uu.each do |m_uu|
+            .container
+              .card.index-teams{:style => "width: 50rem;"}
+                .card-body.prova{:id => "#{m_uu.id}_1"}
+                  %h5.card-title
+                    Match
+                    %p.card-text
+                      .row
+                        .col-3
+                          Creatore Evento:
+                        .col.3
+                          Data:
+                        .col-3
+                          Campetto:
+                        .col-3
+                          Ora:
+                      .row{:style => "margin-top: 0.9%"}
+                        .col-3
+                          = m_uu.creatore.nick
+                        .col-3
+                          = m_uu.data
+                        .col-3
+                          = m_uu.campo
+                        .col-3
+                          = m_uu.ora.strftime("%H:%M")
+                      .row{:style => "margin-top: 5%"}
+                        .col-3
+                          Ruoli disponibili:
+                      .row{:style => "margin-top: 0.9%"}
+                        - @roles_left_uu["#{m_uu.id}"].each do |r|
+                          .col-3
+                            - if logged_in?
+                              = link_to "#{r[1]} in #{r[0]}",nil, :class => "btn btn-danger mb-2"
+                            - else
+                              = link_to "#{r[1]} in #{r[0]}",user_facebook_omniauth_authorize_path, :class => "btn btn-danger mb-2"
+          - @matches_pt.each do |m_pt|
+            .container
+              .card.index-teams{:style => "width: 50rem;"}
+                .card-body.prova{:id => "#{m_pt.id}_1"}
+                  %h5.card-title
+                    Match
+                    %p.card-text
+                      .row
+                        .col-3
+                          Creatore Evento:
+                        .col.3
+                          Data:
+                        .col-3
+                          Campetto:
+                        .col-3
+                          Ora:
+                      .row{:style => "margin-top: 0.9%"}
+                        .col-3
+                          = m_pt.creatore.nick
+                        .col-3
+                          = m_pt.data
+                        .col-3
+                          = m_pt.campo
+                        .col-3
+                          = m_pt.ora.strftime("%H:%M")
+                      - if !@roles_left_pt["#{m_pt.id}"].empty?
+                        .row{:style => "margin-top: 5%"}
+                          .col-3
+                            Ruoli disponibili:
+                        .row{:style => "margin-top: 0.9%"}
+                          - @roles_left_pt["#{m_pt.id}"].each do |r|
+                            .col-3
+                              - if logged_in?
+                                = link_to "#{r}",nil, :class => "btn btn-danger mb-2"
+                              - else
+                                = link_to "#{r}",user_facebook_omniauth_authorize_path, :class => "btn btn-danger mb-2"
+                      - if m_pt.pt.team.empty?
+                        .row{:style => "margin-top: 5%"}
+                          .col-12
+                            - if logged_in?
+                              = form_tag "", method: "put", remote: true do
+                                = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
+                                = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
+                            - else
+                              = form_tag "/user/auth/facebook", method: "get" do
+                                = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
+                                = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
+          - @matches_tt.each do |m_tt|
+            .container
+              .card.index-teams{:style => "width: 50rem;"}
+                .card-body.prova{:id => "#{m_tt.id}_1"}
+                  %h5.card-title
+                    Match
+                    %p.card-text
+                      .row
+                        .col-3
+                          Creatore Evento:
+                        .col.3
+                          Data:
+                        .col-3
+                          Campetto:
+                        .col-3
+                          Ora:
+                      .row{:style => "margin-top: 0.9%"}
+                        .col-3
+                          = m_tt.creatore.nick
+                        .col-3
+                          = m_tt.data
+                        .col-3
+                          = m_tt.campo
+                        .col-3
+                          = m_tt.ora.strftime("%H:%M")
+                      .row{:style => "margin-top: 5%"}
+                        .col-12
+                          - if logged_in?
+                            = form_tag "", method: "put", remote: true do
+                              = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
+                              = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
+                          - else
+                            = form_tag "/user/auth/facebook", method: "get" do
+                              = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
+                              = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
+      .col-6
+        #maps
+          %iframe{:allowfullscreen => "", :frameborder => "0", :height => "500", :src => "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d23754.43534331145!2d12.513070676217678!3d41.9078141916421!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132f6196f9928ebb%3A0xb90f770693656e38!2sRoma+RM!5e0!3m2!1sit!2sit!4v1526561360448", :style => "border:0", :width => "600"}

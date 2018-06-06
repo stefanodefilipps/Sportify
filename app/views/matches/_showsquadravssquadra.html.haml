@@ -1,0 +1,98 @@
+%h5.card-title
+  Match
+  %p.card-text
+    .row
+      .col-4
+      .col-4
+        = form_tag "/users/#{@user.id}/matches/#{@m.id}/endgame", method: "post", remote: true
+        - if (can?(:creator,@m) && ((Date.today<=>@m.data) == 1))
+          %input#set{:min => "0", :name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}"}/
+          %input#set{:min => "0",:name => "punt2", :step => "1", :type => "number", value: "#{@m.punt2}"}/
+          %button.btn.btn-primary{:type => "submit"}
+            %i.fas.fa-check-square.fa-2x
+        - else
+          %input#set{:min => "0",:name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}", readonly: "readonly" }/
+          %input#set{:min => "0",:name => "punt2", :step => "1", :type => "number", value: "#{@m.punt2}", readonly: "readonly"}/
+      .col-4
+        %a#google.btn.btn-outline-dark{:href => "/users/#{@user.id}/matches/#{@m.id}/redirect"}
+          %i.fab.fa-google.fa-2x
+    .row
+      .col-6
+        %br/
+        - if @m.tt.team[0]
+          Team: 
+          = @m.tt.team[0].nome
+          - if (can? :deleteteam, @m) && (!@m.tt.team[0].is_in_team?(@user)) && ((Date.today <=> @m.data) == -1)
+            %a{ :href => "/users/#{@user.id}/matches/#{@m.id}/deleteteam/#{@m.tt.team[0].id}", :style => "color: red", "data-method" => "put", "data-remote" => "true"} 
+              %i.fas.fa-minus-circle.fa-2x
+      .col-6
+        %br/
+        - if @m.tt.team[1]
+          Team: 
+          = @m.tt.team[1].nome
+          - if (can? :deleteteam, @m) && (!@m.tt.team[1].is_in_team?(@user)) && ((Date.today <=> @m.data) == -1)
+            %a{ :href => "/users/#{@user.id}/matches/#{@m.id}/deleteteam/#{@m.tt.team[1].id}", :style => "color: red", "data-method" => "put", "data-remote" => "true"} 
+              %i.fas.fa-minus-circle.fa-2x
+    .row
+      .col-6
+        %br/
+        - if @m.tt.team[0]
+          - @m.tt.team[0].membro.each do |m|
+            %input{:name => "m.ruolo", :readonly => "readonly", :type => "text", value: "#{m.user.nick}"}/
+            %br/
+            %br/
+        - else
+          %input{:name => "team", :readonly => "readonly", :type => "text", value: ""}/
+      .col-6
+        %br/
+        - if @m.tt.team[1]
+          - @m.tt.team[1].membro.each do |m|
+            %input{:name => "m.ruolo", :readonly => "readonly", :type => "text", value: "#{m.user.nick}"}/
+            %br/
+            %br/
+        - else
+          %input{:name => "team", :readonly => "readonly", :type => "text", value: ""}/
+    .row
+      .col-3
+        Data:
+        %br/
+        = @m.data
+      .col-3
+        Ora:
+        %br/
+        = @m.ora.strftime("%H:%M")
+      .col-3
+        Luogo:
+        %br/
+        = @m.campo
+      .col-3
+    - if (Date.today<=>@m.data) == 1
+      .row{:style => "margin-top: 5%"}
+        = form_tag "/users/#{@user.id}/matches/#{@m.id}/endgame", method: "post", remote: true
+        .col-6
+          %input{:name => "giocatore", :type => "text", placeholder: "Giocatore da recensire"}/
+        .col-2
+          %input#set{:min => "0", :max => "5", :name => "voto", :step => "1", :type => "number", value: "0"}/
+        .col-2
+          %button.btn.btn-primary{:type => "submit", :style => "margin-left: 11%"}
+            %i.fas.fa-star.fa-2x
+    .row{:style => "margin-top: 5%"}
+      .col-8
+      .col-4
+        .container
+          //tasto back
+          %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches"} 
+            %i.fas.fa-undo.fa-2x
+          - if (Date.today <=> @m.data) == -1
+            - if (can? :cattain, @m.tt.team[0]) && (@m.tt.team[0].capitano.capitano_id != @user.id)
+              // link utile al capitano per cancellare squadra 0 da una partita
+              %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches/#{@m.id}/leavet/#{@m.tt.team[0].id}", "data-method" => "post"} 
+                %i.fas.fa-sign-out-alt.fa-2x
+            - if (can? :cattain, @m.tt.team[1]) && (@m.tt.team[1].capitano.capitano_id != @user.id)
+              // link utile al capitano per cancellare squadra 1 da una partita
+              %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches/#{@m.id}/leavet/#{@m.tt.team[1].id}", "data-method" => "post"} 
+                %i.fas.fa-sign-out-alt.fa-2x
+            //tasto elimina match
+            - if can? :destroy, @m
+              %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches/#{@m.id}", "data-method" => "delete"} 
+                %i.fas.fa-trash-alt.fa-2x
