@@ -13,16 +13,11 @@
             =image_tag( "sportify.png", height: '70', width: '220')
           .col-sm
     #left
-      %p
-        %b Sei un utente registrato?
-      %button#butt.btn.btn-primary{:type => "button"}
-        %b Accedi usando Facebook
       =image_tag("futsal.jpg", height: '220', width: '300', id: 'image')
-    #right
+    #formok{:style => "margin-right: 30%; margin-top: 5%"}
       %p
         %b Iscriviti a Sportify
-      #sub Partecipa agli eventi sportivi nella tua zona
-    #formok
+      Partecipa agli eventi sportivi nella tua zona
       = form_for(@user) do |f|
         .form-group.row
           = f.label(:nick,"Nickname:", class: "col-sm-2 col-form-label")
@@ -54,11 +49,6 @@
         .form-group.row
           .col-sm-2
             = f.submit("Salva", class: "btn btn-primary")
-
-        #accedibutt
-        %button#button1.btn.btn-primary
-          %b Accedi con Facebook per iscriverti
-
 
 
 

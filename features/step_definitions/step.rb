@@ -179,7 +179,6 @@ end
 Given("I am on the user show page") do
   page.set_rack_session(user_id: @stefano.id)
   visit user_path(@stefano)
-  save_and_open_page
 end
 
 Given("I have been invited to the team Prova") do
@@ -208,4 +207,16 @@ end
 
 Then("I should see the Back Button") do
   expect(page).to have_css("a", :text => "Back")
+end
+
+When("I click on \"Rifiuta\" of Prova notification") do
+  find("input[value=\"deny\"]").click
+end
+
+Then("I should not see the name of the new team") do
+  expect(page).to have_no_content("#{@team.nome}")
+end
+
+Then("I should see the message error") do
+  expect(page).to have_content("Creazione Fallita. Il capitano deve essere in squadra")
 end

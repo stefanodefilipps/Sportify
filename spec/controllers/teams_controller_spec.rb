@@ -282,7 +282,7 @@ RSpec.describe TeamsController, type: :controller do
 
 			it "set the flash[:error]" do
 				put :update, params: @params3
-				expect(flash[:error]).to eq "non sei autorizzato a modificare questa squadra"
+				expect(flash[:error]).to eq "Non sei autorizzato a modificare questa squadra"
 			end
 
 		end
@@ -404,7 +404,80 @@ RSpec.describe TeamsController, type: :controller do
 				expect(flash[:success]).to eq "#{@giorgio.nick} è stato eliminato"
 			end
 		end
+	end
 
+	describe "PUT #invite" do
+		
+		before :each do
+			@user = User.new(nick: "stfn", roles: [:captain])
+			@user.save
+			@giorgio = User.new(nick: "cogiorgio", roles: [:captain])
+			@giorgio.save 
+			@team = Team.new(capitano_id: @user.id, nome: "prova2")
+	    	membro = Membro.new(ruolo: "P")
+	    	membro.team = @team
+	    	membro.user = @user
+	    	membro.save
+	    	@team.save
+	    	session[:user_id] = @user.id
+	    	@params = {:user_id => @user.id, :team_id => @team.id, :A => "", :P => "cogiorgio", :C1 => "", :C2 => "", :D => "", format: :js}
+		end
 
+		before "I am not captain of the team" do
+			@team2 = Team.new(capitano_id: @giorgio.id, nome: "prova2")
+	    	membro = Membro.new(ruolo: "P")
+	    	membro.team = @team2
+	    	membro.user = @user
+	    	membro.save
+	    	@team.save
+	    	@params2 = {:user_id => @user.id, :team_id => @team2.id, :A => "", :P => "cogiorgio", :C1 => "", :C2 => "", :D => "", format: :js}
+		end
+
+		context "with valid parameters" do
+			it "finds user in url" do
+				put :invite, params: @params
+				expect(assigns(:user)).to eq @user
+			end
+			it "finds the team in url" do
+				put :invite, params: @params
+				expect(assigns(:team)).to eq @team
+			end
+			it "finds user to invite" do
+				put :invite, params: @params
+				expect(assigns(:new_member)).to eq @giorgio
+			end
+
+			it "creates a new notification" do
+				expect{
+			      put :invite, params: @params       
+			    }.to change(Notification,:count).by(1)
+			end
+
+			it "sets the flash[:success]" do
+				put :invite, params: @params
+				expect(flash[:success]).to eq "Giocatore #{@giorgio.nick} invitato alla squadra"
+			end
+		end
+
+		context "I am not captain of the team" do |variable|
+			it "finds user in url" do
+				put :invite, params: @params2
+				expect(assigns(:user)).to eq @user
+			end
+			it "finds the team in url" do
+				put :invite, params: @params2
+				expect(assigns(:team)).to eq @team2
+			end
+
+			it "set thee flash[:error]" do
+				put :invite, params: @params2
+				expect(flash[:error]).to eq "Non sei autorizzato a invitare utente in questa squadra"
+			end
+
+			it "redirects to the team index page" do
+				put :invite, params: @params2
+				expect(response).to redirect_to user_teams_path @user
+			end
+		end
 	end
 end

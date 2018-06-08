@@ -98,11 +98,11 @@
           %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches"} 
             %i.fas.fa-undo.fa-2x
           - if (Date.today <=> @m.data) == -1
-            - if (can? :captain, @m.tt.team[0]) && (@m.tt.team[0].capitano.capitano_id != @user.id)
+            - if (can? :captain, @m.tt.team[0]) && (@m.tt.team[0].capitano.id != @user.id)
               // link utile al capitano per cancellare squadra 0 da una partita
               %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches/#{@m.id}/leavet/#{@m.tt.team[0].id}", "data-method" => "post"} 
                 %i.fas.fa-sign-out-alt.fa-2x
-            - if (can? :captain, @m.tt.team[1]) && (@m.tt.team[1].capitano.capitano_id != @user.id)
+            - if (can? :captain, @m.tt.team[1]) && (@m.tt.team[1].capitano.id != @user.id)
               // link utile al capitano per cancellare squadra 1 da una partita
               %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/matches/#{@m.id}/leavet/#{@m.tt.team[1].id}", "data-method" => "post"} 
                 %i.fas.fa-sign-out-alt.fa-2x

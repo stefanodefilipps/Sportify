@@ -8,9 +8,8 @@ class ApplicationController < ActionController::Base
 
   rescue_from CanCan::AccessDenied do |exception|
     if exception.subject.class == Team
-      flash[:error] = "non sei autorizzato a modificare questa squadra"
+      flash[:error] = exception.message
       redirect_to user_teams_path(current_user.id), :alert => exception.message
-      puts exception.message
     else
       redirect_to root_path, :alert => exception.message
     end

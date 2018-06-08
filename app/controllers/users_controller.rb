@@ -85,7 +85,7 @@ class UsersController < ApplicationController
 		@user.tot = 0
 		if @user.save
 			puts "Nuovo utente creato"
-			redirect_to user_matches @user
+			redirect_to user_matches_path @user
 			return
 		end
 		redirect_to root_path

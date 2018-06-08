@@ -64,7 +64,10 @@
                         - @roles_left_uu["#{m_uu.id}"].each do |r|
                           .col-3
                             - if logged_in?
-                              = link_to "#{r[1]} in #{r[0]}",nil, :class => "btn btn-danger mb-2"
+                              = form_tag "/users/#{current_user.id}/matches/#{m_uu.id}/aggiungi", method: "post" do
+                                = text_field_tag "squadra",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r[0]}"
+                                = text_field_tag "ruolo",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r[1,r.length-1]}"
+                                =  submit_tag "#{r[1]} in #{r[0]}", class: "btn btn-primary"
                             - else
                               = link_to "#{r[1]} in #{r[0]}",user_facebook_omniauth_authorize_path, :class => "btn btn-danger mb-2"
           - @matches_pt.each do |m_pt|
@@ -100,15 +103,18 @@
                           - @roles_left_pt["#{m_pt.id}"].each do |r|
                             .col-3
                               - if logged_in?
-                                = link_to "#{r}",nil, :class => "btn btn-danger mb-2"
+                                = form_tag "/users/#{current_user.id}/matches/#{m_pt.id}/aggiungi", method: "post" do
+                                  = text_field_tag "ruolo",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r}"
+                                  = text_field_tag "team",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: ""
+                                  =  submit_tag "#{r}", class: "btn btn-primary"
                               - else
                                 = link_to "#{r}",user_facebook_omniauth_authorize_path, :class => "btn btn-danger mb-2"
-                      - if m_pt.pt.team.empty?
+                      - if (m_pt.pt.team.empty?) && (!m_pt.is_waiting_response_for_team)
                         .row{:style => "margin-top: 5%"}
                           .col-12
                             - if logged_in?
-                              = form_tag "", method: "put", remote: true do
-                                = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
+                              = form_tag "/users/#{current_user.id}/matches/#{m_pt.id}/aggiungi", method: "post" do
+                                = text_field_tag "team",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
                                 = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
                             - else
                               = form_tag "/user/auth/facebook", method: "get" do
@@ -141,9 +147,9 @@
                           = m_tt.ora.strftime("%H:%M")
                       .row{:style => "margin-top: 5%"}
                         .col-12
-                          - if logged_in?
-                            = form_tag "", method: "put", remote: true do
-                              = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
+                          - if (logged_in?) && (!m_tt.is_waiting_response_for_team)
+                            = form_tag "/users/#{current_user.id}/matches/#{m_tt.id}/aggiungi", method: "post" do
+                              = text_field_tag "team",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
                               = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
                           - else
                             = form_tag "/user/auth/facebook", method: "get" do
