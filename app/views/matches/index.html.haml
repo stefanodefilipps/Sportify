@@ -40,8 +40,8 @@
         .container.user_column
           %p.user_column_obj
             %b#val Valutazione:
-            - if current_user.voto != 0
-              = (current_user.voto/current_user.tot).round(1)
+            - if @user.voto != 0
+              = (@user.voto/@user.tot).round(1)
             - else
               0
         .container.user_column

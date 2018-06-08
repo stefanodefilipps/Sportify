@@ -1,6 +1,7 @@
 class TeamsController < ApplicationController
 
 	#before_action :inizializza_flash
+	skip_before_action :verify_authenticity_token
 
 	def new
 		@team = Team.new

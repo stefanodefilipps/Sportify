@@ -5,7 +5,7 @@ require '././spec/spec_helper'
 require "cancan/matchers"
 
 Given("I am on the match index page") do
-  @user = create(:user)
+  @user = create(:user, voto: 0, tot: 0)
   page.set_rack_session(user_id: @user.id)
   visit user_matches_path @user
 end
@@ -13,7 +13,7 @@ end
 Given("There is at least a team") do
   @team = create(:team, capitano_id: @user.id)
   create(:membro, team_id: @team.id, user_id: @user.id)
-  user = create(:user, nome: "Giorgio", cognome: "Coccia", nick: "cogiorgio")
+  user = create(:user, nome: "Giorgio", cognome: "Coccia", nick: "cogiorgio", voto: 0, tot: 0)
   @team2 = create(:team, nome: "stefanino", capitano_id: user.id)
   create(:membro, team_id: @team2.id, user_id: user.id)
   create(:membro, team_id: @team2.id, user_id: @user.id, ruolo: "A")
@@ -29,7 +29,7 @@ Then("I should see the teams names") do
 end
 
 Given("There is at least a team I am not member of") do
-	user = create(:user, nome: "Giorgio", cognome: "Coccia", nick: "cogiorgio", roles: :captain)
+	user = create(:user, nome: "Giorgio", cognome: "Coccia", nick: "cogiorgio", roles: :captain, voto: 0, tot: 0)
 	@team2 = create(:team, nome: "stefanino", capitano_id: user.id)
 	@team = create(:team, capitano_id: @user.id)
   	create(:membro, team_id: @team.id, user_id: @user.id)
@@ -49,7 +49,7 @@ Given("I am on the team index page") do
 end
 
 Given("There is at least a team I am member of") do
-  @user = create(:user, roles: :captain)
+  @user = create(:user, roles: :captain, voto: 0, tot: 0)
   @team = create(:team, capitano_id: @user.id)
   @user.roles << :captain
   @user.save
@@ -140,7 +140,7 @@ Then("I should choose a role") do
 end
 
 Then("I should invite another user") do
-  @giorgio = User.create(nome: "Giorgio", cognome: "Coccia", nick: "cogiorgio")
+  @giorgio = User.create(nome: "Giorgio", cognome: "Coccia", nick: "cogiorgio", voto: 0, tot: 0)
   fill_in "C1", with: "#{@giorgio.nick}"
 end
 
@@ -168,10 +168,10 @@ Then("I should see the actual member of the team") do
 end
 
 Given("I am not on the team Prova") do
-  @giorgio = User.create(nome: "Giorgio",cognome: "Coccia", nick: "cogiorgio", roles: :captain)
+  @giorgio = User.create(nome: "Giorgio",cognome: "Coccia", nick: "cogiorgio", roles: :captain, voto: 0, tot: 0)
   @team = Team.create(nome: "Prova", capitano_id: @giorgio.id)
   membro = Membro.create(user_id: @giorgio.id, team_id: @team.id, ruolo: "A")
-  @stefano = User.create(nome: "Stefano",cognome: "De Filippis", nick: "stfn")
+  @stefano = User.create(nome: "Stefano",cognome: "De Filippis", nick: "stfn", voto:0, tot: 0)
   @notification = Notification.create(tipo: 2, data: Date.today, ora: Time.now, msg: "#{@giorgio.nick} ti ha invitato a partecipare alla squadra Prova", sender_id: @giorgio.id, receiver_id: @stefano.id)
   sq = Sq.create(team_id: @team.id, notification_id: @notification.id, ruolo: "P")
 end
