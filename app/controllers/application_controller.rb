@@ -2,12 +2,13 @@ class ApplicationController < ActionController::Base
 
   #rails server -b 'ssl://localhost:3000?key=/home/biar/Desktop/localhost.key&cert=/home/biar/Desktop/localhost.crt'
 
-  protect_from_forgery with: :exception
+  protect_from_forgery with: :exception unless Rails.env.test?
 
   helper_method :current_user, :logged_in?
 
   rescue_from CanCan::AccessDenied do |exception|
     if exception.subject.class == Team
+      flash[:error] = "non sei autorizzato a modificare questa squadra"
       redirect_to user_teams_path(current_user.id), :alert => exception.message
       puts exception.message
     else

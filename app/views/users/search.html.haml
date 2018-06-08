@@ -18,13 +18,16 @@
               %input.form-control.mr-sm-2{"aria-label" => "Search", :placeholder => "Search", :style => "width: 48%;", :type => "search"}/
               %button.btn.btn-outline-success.my-2.my-sm-0{:type => "submit"} Search
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}"}
             %b Profile
+            - if @user.unread_notifications.size > 0
+              %span.badge.badge-light 
+                = @user.unread_notifications.size
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}/matches/mode/new"}
             %b Play
         .col-3
-          %a{:href => "#"}
+          %a{:href => "/users/#{@user.id}/matches"}
             %b Home
     .row
       .col-2.border-right{:style => "margin-left: 1.4%"}
@@ -37,22 +40,28 @@
         .container.user_column
           %p.user_column_obj
             %b#val Valutazione:
-            - if current_user.voto != nil
-              current_user.voto
+            - if current_user.voto != 0
+              = (current_user.voto/current_user.tot).round(1)
+            - else
+              0
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b Teams
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b Logout
-
-    #utentetrovato
-      %p
-        %b Utenti trovati
-      %br/
-      #barratesto
-        %input#nickname{:name => "nicknameutente", :readonly => "readonly", :type => "text"}/
-        %button#button1.btn.btn-primary
-          %b Vedi profilo utente
-        %br/
-        %br/
+        .container.user_column
+          = form_tag "/users/#{@user.id}/search", method: "get" do
+            %input.form-control{:name => "nome", :placeholder => "Cerca utente", :type => ""}/
+            %button.btn.btn-outline-dark{:type => "submit"}
+              %i.fas.fa-search
+      .col-2
+      .col-6
+        .row
+          %p{:style => "font-size: 35px"}
+            %b Utenti trovati
+      
+        - @array.each do |u|
+          .row
+            %input.form-control{:name => "cercautente", disabled: true, :style => "width: 50%", :type => "", :value => "Nome: #{u.nome}  Cognome: #{u.cognome}  Nick: #{u.nick}"}/
+            %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/show/#{u.id}"} Vedi Profilo    

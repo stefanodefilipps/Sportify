@@ -40,8 +40,10 @@
         .container.user_column
           %p.user_column_obj
             %b#val Valutazione:
-            - if @user.voto != nil
-              = (@user.voto/@user.tot).round(1)
+            - if current_user.voto != 0
+              = (current_user.voto/current_user.tot).round(1)
+            - else
+              0
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b

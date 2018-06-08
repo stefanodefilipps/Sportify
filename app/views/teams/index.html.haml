@@ -52,6 +52,20 @@
             %b 
               = link_to "Logout", logout_path, method: :delete
       .col-8
+        .row
+          .col-4
+          #error.col-4
+            - if flash[:error_cd]
+              .container{:style => "margin-top: 10%"}
+                .alert.alert-danger{:role => "alert"}
+                  = flash[:error_cd]
+        .row
+          .col-4
+          #success.col-4
+            - if flash[:success_cd]
+              #success.container{:style => "margin-top: 10%"}
+                .alert.alert-success{:role => "alert"}
+                  = flash[:success_cd]
         .row{:style => "margin-top: 15%"}
           .col-3{:style => "margin-left: 20%"}
             %i.fas.fa-futbol.fa-5x{:style => "padding-right: 3%"}

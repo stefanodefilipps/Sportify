@@ -5,6 +5,8 @@ class Team < ApplicationRecord
 	belongs_to :capitano, class_name: "User"
 	has_and_belongs_to_many :pt
 	has_and_belongs_to_many :tt
+	has_many :sq, dependent: :delete_all
+	has_many :notification, through: :sq
 
 	def roles_left
 		roles = ["A","C1","C2","D","P"]

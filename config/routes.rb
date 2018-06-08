@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   get 'login', to: "sessions#new"
   post 'login', to: "sessions#create"
   delete 'logout', to: "sessions#destroy"
+  get '/users/:user_id/show/:id', to: "users#show_user", as: "user_show_user"
+  get '/users/:user_id/search/', to: "users#search", as: "user_search"
 
   post '/users/:id/matches/:match_id/leavet/:team_id', to: "matches#leaveteam"
   get '/users/:id/matches/:match_id/leavep', to: "matches#leaveplayer"

@@ -141,6 +141,12 @@ class MatchesController < ApplicationController
 					(m.tt.team[0] != nil && !m.tt.team[0].is_in_team?(current_user)) ||
 					(m.tt.team[1] != nil && !m.tt.team[1].is_in_team?(current_user))
 				}
+
+				@hash = Gmaps4rails.build_markers(@matches_uu) do |m, marker|
+  				marker.lat m.lat
+  				marker.lng m.lng
+				end
+
 				@roles_left_uu = Hash.new
 				@matches_uu.each do |m_uu|
 					@roles_left_uu["#{m_uu.id}"] = find_roles_left(m_uu).select{|r| r[1] == current_user.ruolo1 || r[1] == current_user.ruolo2}

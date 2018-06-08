@@ -1,5 +1,7 @@
 class TeamsController < ApplicationController
 
+	#before_action :inizializza_flash
+
 	def new
 		@team = Team.new
 		@user = User.find_by(id: params[:user_id])
@@ -19,40 +21,45 @@ class TeamsController < ApplicationController
 	#Se un utente specificato non esiste allora cancello la squadra
 
 	def create
-		capitano = User.find_by(id: params[:user_id])
+		@capitano = User.find_by(id: params[:user_id])
 		@team = Team.new
 		@team.nome = params[:nome]
-		@team.capitano = capitano
+		@team.capitano = @capitano
 		giocatori = params.select {|k,v| k == "A" || k == "D" || k == "C1" || k == "P" || k == "C2"}
-		puts giocatori.select{|k,v| v == capitano.nick}.empty?
-		if giocatori.select{|k,v| v == capitano.nick}.empty?
+		puts giocatori.select{|k,v| v == @capitano.nick}.empty?
+		if giocatori.select{|k,v| v == @capitano.nick}.empty?
+			flash[:error_cd] ="Creazione Fallita. Il capitano deve essere in squadra"
 			puts "Capitano deve essere in squadra"
 			redirect_to user_teams_path(current_user.id)
 			return
 		end
 		giocatori.each do |k,v|
 			if v != ""
-				if v == capitano.nick
+				if v == @capitano.nick
 					mem = Membro.new
 					mem.ruolo = k
 					mem.team = @team
-					mem.user = capitano
+					mem.user = @capitano
 					begin 										#provo a salvare membro ma devo controllare che l'user non sia gia presente nella squadra altrimenti postgres
 						mem = mem.save							#mi lancia l'errore che il record non è unico e quindi se si verifica in questo punto devo cancellare la squadra
 					rescue ActiveRecord::RecordNotUnique => e
 						puts e.message.upcase
+						flash[:error_cd] ="Creazione Team fallita, utente presente più volte o due utenti con stesso ruolo"
 						@team.destroy
 						redirect_to user_teams_path(current_user.id)
 						return
 					end
 					if !mem
 						@team.destroy
+						flash[:error_cd] ="problemi ad aggiungere un giocatore squadra non creata"
 						puts "problemi ad aggiungere un giocatore squadra non creata"
 						redirect_to user_teams_path(current_user.id)
+						return
 					end
 				else
 					player = User.find_by(nick: v)
 					if !player
+						flash[:error_cd] = "User #{v} non esistente"
 						puts "User non esistente"
 						@team.destroy
 						redirect_to user_teams_path(current_user.id)
@@ -60,13 +67,14 @@ class TeamsController < ApplicationController
 					end
 
 					notifica = Notification.new
-					notifica.sender = capitano
+					notifica.sender = @capitano
 					notifica.receiver = player
 					notifica.data = Date.today
 					notifica.ora = Time.now
-					notifica.msg = "#{capitano.nick} ti ha invitato a partecipare alla squadra #{@team.nome}"
+					notifica.msg = "#{@capitano.nick} ti ha invitato a partecipare alla squadra #{@team.nome}"
 					notifica.tipo = 2
 					if !notifica.save
+						flash[:error_cd] ="Impossibile invitare #{player.nick}"
 						puts "Impossibile invitare #{player.nick}"
 					else
 						notifica_squadra = Sq.new
@@ -74,9 +82,11 @@ class TeamsController < ApplicationController
 						notifica_squadra.team = @team
 						notifica_squadra.ruolo = k
 						if !notifica_squadra.save
+							flash[:error_cd] ="Impossibile invitare #{player.nick}"
 							puts "Impossibile invitare #{player.nick}"
 							notifica.destroy
 						else
+							flash[:success_cd] = "Giocatore #{player.nick} invitato alla squadra"
 							puts "Giocatore #{player.nick} invitato alla squadra"
 						end
 					end
@@ -102,15 +112,17 @@ class TeamsController < ApplicationController
 			end
 		end
 		if @team.save
-			capitano.roles << :captain
-			if capitano.save
+			@capitano.roles << :captain
+			if @capitano.save
+				flash[:success_cd] = "Nuova squadra creata con successo"
 				puts "Nuova squadra creata con successo"
 				redirect_to user_teams_path(current_user.id)
 				return
 			end
 		end
+		flash[:error_cd] = "problemi nella creazione della squadra"
 		puts "problemi nella creazione della squadra"
-		redirect_to root_path
+		redirect_to user_teams_path(current_user.id)
 	end
 
 	#Questa funzione serve per mostrare tutte le squadre relative a un utente passato nella url. Se id nella url è diversa da quella
@@ -120,15 +132,17 @@ class TeamsController < ApplicationController
 	def index
 		@user = User.find_by(id: params[:user_id])
 		if !@user
+			flash[:error] = "User non esistente"
 			puts "User non esistente"
 			redirect_to root_path
 			return		
 		end
-		if @user != current_user
+		if @user.id != current_user.id
 			redirect_to user_teams_path(current_user)
 			return
 		end
 		if !@user
+			flash[:error] = "User non esistente"
 			puts "User non esistente"
 			redirect_to root_path
 			return		
@@ -143,13 +157,15 @@ class TeamsController < ApplicationController
 		@user = User.find_by(id: params[:user_id])
 		if !@user
 			puts "User non esistente"
-			redirect_to root_path
+			flash[:error] = "User non esistente"
+			redirect_to user_teams_path(current_user.id)
 			return		
 		end
 		@team = Team.find_by(id: params[:id])
 		if !@team
+			flash[:error] = "Team non esistente"
 			puts "squadra non esistente"
-			redirect_to root_path
+			redirect_to user_teams_path(current_user.id)
 			return
 		end
 		authorize! :show,@team, :message => "Non sei autorizzato a vedere questa partita"
@@ -169,29 +185,37 @@ class TeamsController < ApplicationController
 	def update
 		@team = Team.find_by(id: params[:id])
 		if !@team
+			flash[:error] = "Team non esistente"
 			return
 		end
 		authorize! :edit, @team, :message => "Non sei autorizzato a modificare questa partita"
 		puts "sei capitano della squadra update"
 		if params[:nome] == ""
+			flash[:error] = "Aggiungere un nuovo nome"
 			puts "Aggiungere un nuovo nome"
+			return
 		end
 		@team.nome = params[:nome]
 		if @team.save
+			flash[:success] = "Nome cambiato con successo"
 			puts "Nome cambiato con successo"
 			return
 		end
+		flash[:error] = "Impossibile cambiare il nome della squadra"
 		puts "Impossibile cambiare il nome della squadra"
 	end
 
 	def destroy
 		@team = Team.find_by(id: params[:id])
 		if !@team
+			flash[:error_cd] = "Team Non esistente"
 			redirect_to user_teams_path(current_user.id)
 			return
 		end
 		authorize! :destroy, @team, :message => "Non sei autorizzato a eliminare questa partita"
 		@team.destroy
+		flash[:success_cd] = "Team #{@team.nome} distrutta con successo"
+		puts "distrutta"
 		redirect_to user_teams_path(current_user.id)
 	end
 
@@ -204,22 +228,26 @@ class TeamsController < ApplicationController
 		@user = User.find_by(id: params[:user_id])
 		if !@user
 			puts "User non esistente"
+			flash[:error] = "User non esistente"
 			redirect_to root_path
 			return		
 		end
 		if @user != current_user
 			puts "User non esistente 2"
+			flash[:error] = "User non esistente"
 			redirect_to user_teams_path(current_user.id)
 			return
 		end
 		@team = Team.find_by(id: params[:id])
 		if !@team
+			flash[:error] = "Team non esistente"
 			puts "squadra non esistente"
-			redirect_to root_path
+			redirect_to user_teams_path(current_user.id)
 			return
 		end
 		authorize! :leave, @team, :message => "Non sei autorizzato ad abbandonare questa partita"
 		@team.membro.where(user_id: @user.id)[0].destroy
+		flash[:success] = "Ti sei eliminato con successo dalla squadra"
 		puts "utente cancellato dalla squadra"
 		redirect_to user_teams_path(@user)
 	end
@@ -229,23 +257,27 @@ class TeamsController < ApplicationController
 	def remove
 		@user = User.find_by(id: params[:user_id])
 		if !@user
+			flash[:error] = "User non esistente"
 			puts "User non esistente"
 			#redirect_to user_team_path current_user, @team
 			return		
 		end
 		if @user != current_user
+			flash[:error] = "User non esistente"
 			puts "User non esistente 2"
 			#redirect_to user_team_path current_user, @team
 			return
 		end
 		@team = Team.find_by(id: params[:team_id])
 		if !@team
+			flash[:error] = "Team non esistente"
 			puts "squadra non esistente"
 			#redirect_to user_team_path current_user, @team
 			return
 		end
 		@user_to_remove = User.find_by(id: params[:user])
 		if !@user_to_remove
+			flash[:error] = "User da rimuovere non esistente"
 			puts "User da rimuovere non esistente"
 			redirect_to user_team_path current_user, @team
 			return		
@@ -254,9 +286,11 @@ class TeamsController < ApplicationController
 		if is_in_team?(@user_to_remove,@team)
 			@team.membro.where(user_id: @user_to_remove.id).destroy_all
 			#redirect_to user_team_path current_user, @team
+			flash[:success] = "#{@user_to_remove.nick} è stato eliminato"
 			puts "#{@user_to_remove.nick} è stato eliminato"
 			return
 		end
+		flash[:error] = "#{@user_to_remove.nick} non è presente nella squadra"
 		puts "#{@user_to_remove.nick} non è presente nella squadra"
 		#redirect_to user_team_path current_user, @team
 	end
@@ -267,23 +301,27 @@ class TeamsController < ApplicationController
 	def captain
 		@user = User.find_by(id: params[:user_id])
 		if !@user
+			flash[:error] = "User non esistente"
 			puts "User non esistente"
 			#redirect_to user_team_path current_user, @team
 			return		
 		end
 		if @user != current_user
+			flash[:error] = "User non esistente"
 			puts "User non esistente 2"
 			#redirect_to user_team_path current_user, @team
 			return
 		end
 		@team = Team.find_by(id: params[:team_id])
 		if !@team
+			flash[:error] = "Team non esistente"
 			puts "squadra non esistente"
 			#redirect_to user_team_path current_user, @team
 			return
 		end
 		@new_captain = User.find_by(id: params[:user])
 		if !@new_captain
+			flash[:error] = "Nuovo Capitano non esistente"
 			puts "Nuovo capitano non esistente"
 			#redirect_to user_team_path current_user, @team
 			return		
@@ -292,31 +330,36 @@ class TeamsController < ApplicationController
 		if is_in_team? @new_captain, @team
 			@team.capitano = @new_captain
 			if @team.save
+				flash[:success] = "Ruolo Capitano passato a #{@new_captain.nick}"
 				puts "Ruolo passato a #{@new_captain.nick}"
 				#redirect_to user_team_path current_user, @team
 				return
 			end
+			flash[:error] = "impossibile passare il ruolo di capitano"
 			puts "impossibile passare il ruolo di capitano"
 			#redirect_to user_team_path current_user, @team
 		end
-		puts "#{@user_to_remove.nick} non è presente nella squadra"
+		flash[:error] = "#{@new_captain.nick} non è nella squadra"
 		#redirect_to user_team_path current_user, @team
 	end
 
 	def invite
 		@user = User.find_by(id: params[:user_id])
 		if !@user
+			flash[:error] = "User non esistente"
 			puts "User non esistente"
 			#redirect_to user_team_path current_user, @team
 			return		
 		end
 		if @user != current_user
+			flash[:error] = "User non esistente"
 			puts "User non esistente 2"
 			#redirect_to user_team_path current_user, @team
 			return
 		end
 		@team = Team.find_by(id: params[:team_id])
 		if !@team
+			flash[:error] = "Team non esistente"
 			puts "squadra non esistente"
 			#redirect_to user_team_path current_user, @team
 			return
@@ -332,6 +375,7 @@ class TeamsController < ApplicationController
 		end
 		@new_member = User.find_by(nick: nick)
 		if !@new_member
+			flash[:error] = "User da invitare non esistente"
 			puts "User non esistente"
 			#redirect_to user_team_path current_user, @team
 			return		
@@ -344,6 +388,7 @@ class TeamsController < ApplicationController
 		notifica.msg = "#{@team.capitano.nick} ti ha invitato a partecipare alla squadra #{@team.nome}"
 		notifica.tipo = 2
 		if !notifica.save
+			flash[:error] = "Impossibile invitare #{@new_member.nick}"
 			puts "Impossibile invitare #{@new_member.nick}"
 			return
 		else
@@ -352,10 +397,12 @@ class TeamsController < ApplicationController
 			notifica_squadra.team = @team
 			notifica_squadra.ruolo = ruolo
 			if !notifica_squadra.save
+				flash[:error] = "Impossibile invitare #{@new_member.nick}"
 				puts "Impossibile invitare #{@new_member.nick}"
 				notifica.destroy
 				return
 			else
+				flash[:success] = "Giocatore #{@new_member.nick} invitato alla squadra"
 				puts "Giocatore #{@new_member.nick} invitato alla squadra"
 				return
 			end
@@ -385,4 +432,5 @@ class TeamsController < ApplicationController
 	def is_in_team?(user,team)
 		return team.user.where(id: user.id)[0]
 	end
+
 end

@@ -1,18 +1,32 @@
 %h5.card-title
-  Match
+  - if @m.tipo == 1
+    %h5.card-title Players Vs Players
+  - elsif @m.tipo == 2
+    %h5.card-title Players Vs Team
+  - elsif @m.tipo == 3
+    %h5.card-title Team Vs Team
+  Status:
+  - if (Date.today <=> @m.data) == -1
+    Da giocare
+  - elsif (Date.today <=> @m.data) == 0
+    Giorno della partita
+  - else (Date.today <=> @m.data) == 1
+    Terminato
   %p.card-text
     .row
-      .col-1
+      .col-4
+        Creatore:
+        = @m.creatore.nick
       .col-4 
-      = form_tag "/users/#{@user.id}/matches/#{@m.id}/endgame", method: "post", remote: true do
-        - if (can?(:creator,@m) && ((Date.today<=>@m.data) == 1))
-          %input#set{:min => "0", :name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}"}/
-          %input#set{:min => "0",:name => "punt2", :step => "1", :type => "number", value: "#{@m.punt2}"}/
-          %button.btn.btn-primary{:type => "submit"}
-            %i.fas.fa-check-square.fa-2x
-        - else
-          %input#set{:min => "0",:name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}", readonly: "readonly" }/
-          %input#set{:min => "0",:name => "punt2", :step => "1", :type => "number", value: "#{@m.punt2}", readonly: "readonly"}/
+        = form_tag "/users/#{@user.id}/matches/#{@m.id}/endgame", method: "post", remote: true do
+          - if (can?(:creator,@m) && ((Date.today<=>@m.data) == 1))
+            %input#set{:min => "0", :name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}"}/
+            %input#set{:min => "0",:name => "punt2", :step => "1", :type => "number", value: "#{@m.punt2}"}/
+            %button.btn.btn-primary{:type => "submit"}
+              %i.fas.fa-check-square.fa-2x
+          - else
+            %input#set{:min => "0",:name => "punt1", :step => "1", :type => "number", value: "#{@m.punt1}", readonly: "readonly" }/
+            %input#set{:min => "0",:name => "punt2", :step => "1", :type => "number", value: "#{@m.punt2}", readonly: "readonly"}/
       .col-4
         %a#google.btn.btn-outline-dark{:href => "/users/#{@user.id}/matches/#{@m.id}/redirect", :style => "margin-left: 60%"}
           %i.fab.fa-google.fa-2x

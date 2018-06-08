@@ -132,6 +132,7 @@ GEM
     gherkin (5.1.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
+    gmaps4rails (2.1.2)
     google-api-client (0.23.0)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (>= 0.5, < 0.7.0)
@@ -271,6 +272,10 @@ GEM
       bundler (>= 1.3.0)
       railties (= 5.1.6)
       sprockets-rails (>= 2.0.0)
+    rails-controller-testing (1.0.2)
+      actionpack (~> 5.x, >= 5.0.1)
+      actionview (~> 5.x, >= 5.0.1)
+      activesupport (~> 5.x)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
@@ -365,6 +370,7 @@ GEM
     uber (0.1.0)
     uglifier (4.1.10)
       execjs (>= 0.3.0, < 3)
+    underscore-rails (1.8.3)
     warden (1.2.7)
       rack (>= 1.0)
     web-console (3.6.2)
@@ -394,6 +400,7 @@ DEPENDENCIES
   faker
   geckodriver-helper
   geokit-rails
+  gmaps4rails
   google-api-client (~> 0.11)
   guard-rspec
   haml-rails (~> 1.0)
@@ -410,6 +417,7 @@ DEPENDENCIES
   puma (~> 3.7)
   rack_session_access
   rails (~> 5.1.6)
+  rails-controller-testing
   rspec-rails
   sass-rails (~> 5.0)
   selenium-webdriver (~> 3.12)
@@ -418,6 +426,7 @@ DEPENDENCIES
   turbolinks (~> 5)
   tzinfo-data
   uglifier (>= 1.3.0)
+  underscore-rails
   web-console (>= 3.3.0)
 
 BUNDLED WITH

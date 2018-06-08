@@ -46,6 +46,8 @@ gem 'canard', '~> 0.5.0.pre'
 gem 'rack_session_access'
 gem 'geckodriver-helper'
 gem 'selenium-webdriver', '~> 3.12'
+gem 'gmaps4rails'
+gem 'underscore-rails'
 
 
 group :development, :test do
@@ -56,6 +58,7 @@ group :development, :test do
   gem 'selenium-webdriver', '~> 3.12'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+  gem 'rails-controller-testing'
 end
 
 group :development do

@@ -1,1 +1,11 @@
 $("##{@team.id}_1").html("#{j(render("show"))}")
+- if flash[:error]
+	$("#error").css("margin-top", "10%")
+	$("#error").html("")
+	$("#success").html("")
+	$("#error").append("<div class= \"container\"><div class=\"alert alert-danger\" role=\"alert\">#{flash[:error]}</div><\div>")
+- if flash[:success]
+	$("#success").css("margin-top", "10%")
+	$("#success").html("")
+	$("#error").html("")
+	$("#error").append("<div class= \"container\"><div class=\"alert alert-success\" role=\"alert\">#{flash[:success]}</div><\div>")

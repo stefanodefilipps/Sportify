@@ -20,7 +20,7 @@ Given("There is at least a team") do
 end
 
 When("I click on \"Teams\"") do
-	click_link("Teams")
+  find("a[href=\'#{user_teams_path(@user)}\']").click
 end
 
 Then("I should see the teams names") do
@@ -114,7 +114,7 @@ Then("I should see the same team") do
 end
 
 Then("I should not see the nickname of the deleted member") do
-  expect(page).to have_no_content("#{@user2.nick}")
+  expect(page).to have_no_selector("input[value=\'#{@user2.nick}}\']")
 end
 
 When("I click on \"Crea Squadra\"") do
@@ -176,9 +176,10 @@ Given("I am not on the team Prova") do
   sq = Sq.create(team_id: @team.id, notification_id: @notification.id, ruolo: "P")
 end
 
-Given("I am on the notification index page") do
+Given("I am on the user show page") do
   page.set_rack_session(user_id: @stefano.id)
-  visit notifications_path
+  visit user_path(@stefano)
+  save_and_open_page
 end
 
 Given("I have been invited to the team Prova") do
@@ -186,7 +187,7 @@ Given("I have been invited to the team Prova") do
 end
 
 When("I click on \"Accetta\" of Prova notification") do
-  click_link("Accetta")
+  find("input[value=\"accept\"]").click
 end
 
 Given("I am on the index team page") do

@@ -16,16 +16,6 @@
 //= require jquery_ujs
 //= require popper
 //= require bootstrap-sprockets
+//= require underscore
+//= require gmaps/google
 //= require_tree .
-
-$(document).ready(function() {
-	$("button").click(function(){
-		id = $(this).attr("id");
-		nome = $("#col_"+id).text();
-		lat = $("#lat_"+id).text();
-		lng = $("#lng_"+id).text();
-		$("lat").attr("value", lat);
-		$("lng").attr("value", lng);
-		$("nome").attr("value", nome);
-	})
-})

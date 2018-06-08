@@ -6,7 +6,7 @@ Feature: Accept Invite To Team
 @javascript
 Scenario: create a team
 	Given I am not on the team Prova
-	And I am on the notification index page
+	And I am on the user show page
 	And I have been invited to the team Prova
 	When I click on "Accetta" of Prova notification
 	Given I am on the index team page

@@ -91,6 +91,25 @@ class UsersController < ApplicationController
 		redirect_to root_path
 	end
 
+	def show_user
+		@user = User.find_by(id: params[:user_id])
+		@user2 = User.find_by(id: params[:id])
+		if(@user2.voto != nil && @user2.voto != 0)
+			@rate=@user2.voto / @user2.tot
+		else 
+			@rate=0.to_f
+		end
+	end
+
+	def search
+		@user = User.find_by(id: params[:user_id])
+		if params[:nome].split(" ")[1]
+			@array = User.where(nome: params[:nome].split(" ")[0], cognome: params[:nome].split(" ")[1])
+			return
+		end
+		@array = User.where(nome: params[:nome].split(" ")[0])
+	end
+
 	private
 
 	def user_params
