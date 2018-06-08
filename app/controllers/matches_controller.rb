@@ -20,6 +20,42 @@ class MatchesController < ApplicationController
 		end
 		redirect_to user_matches_path current_user
 	end
+	def aggiungi
+		@match=Match.find_by(id: params[:match_id])
+		if(@match.uu !=nil)
+			if(@match.uu.user.where(id: params[:user_id])[0] == nil)
+			    	Gioca.create(user_id: params[:user_id,ruolo:params[:ruolo],squadra:params[:squadra], uu_id: @match.uu.id)	
+			end
+		elsif (@match.pt !=nil)
+			if(params[:team != ""])
+				@team = Team.find_by(nome: params[:team])
+				if(@team==nil) 
+					puts "Team A non trovato!" 
+					redirect_to user_matches_path current_user
+					return
+			    end
+			    if(@team.capitano_id.to_i == params[:user_id].to_i && @match.pt.user.where(id: params[:user_id])[0])
+			    	@team.pt << @pt
+			    	@team.save
+			    end
+			else
+				if(@match.pt.user.where(id: params[:user_id])[0] == nil )
+					if( @match.pt.team[0]==nil || @match.pt.team[0].capitano_id.to_i != params[:user_id].to_i) 
+			    	Squadra.create(user_id: params[:user_id],ruolo:params[:ruolo],pt_id: @match.pt.id)	
+			    	end
+				end
+			end
+		else
+			if( (@match.tt.team[0]==nil||@match.tt.team[0].user.where(id: user.id)[0]==nil) && (@match.tt.team[1]==nil||@match.tt.team[1].user.where(id: user.id)[0]==nil))
+				if(@team.capitano_id.to_i == params[:user_id].to_i)
+					@team.tt << @match.tt
+					@team.save
+				end
+			end
+		end
+		redirect_to user_matches_path current_user
+		
+	end
 	#Questa action permette di vedere in dettaglio la partita distinta da id_match definito nella url. Prima controllo che 
 	#lo user partecipi effettivamente al match, altrimenti lo rimando su root. Se il test viene verificato allora:
 	#-Se la partita è uu mi prendo la collezione dei gioca associati a quella partita così da avere tutti gli utenti che 
@@ -204,16 +240,26 @@ class MatchesController < ApplicationController
     #CREA EVENTO
 	def create
 		    if(params[:tipo]=="uu")
+		    	user=User.find_by(id: params[:user_id])
+		    	b=false
 				params.each do |k,v|
-				if(k[0]=="g" )
-					if(v != "")
-			  			if(User.find_by(nick: v)==nil) 
-			  			puts "Giocatore #{k} non trovato!" 
-			  			redirect_to user_matches_path current_user
-			  			return
-			  			end
-			  		end
-			    end
+					if(k[0]=="g" )
+						if(v != "")
+							if(user.nick == v)
+								b=true 
+							end
+				  			if(User.find_by(nick: v)==nil) 
+				  			puts "Giocatore #{k} non trovato!" 
+				  			redirect_to user_matches_path current_user
+				  			return
+				  			end
+				  		end
+				    end
+				end
+				if(b == false)
+					puts "Creatore della partita non presente in gioco!" 
+				  	redirect_to user_matches_path current_user
+				  	return
 				end
 				@match=Match.new
 		    	@match.punt1=0
@@ -228,56 +274,49 @@ class MatchesController < ApplicationController
 		    	@match.save
 		    	@uu=Uu.create(match_id: @match.id)
             	if(params[:g1]!="")
-				gioca1=Gioca.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"P",squadra:"a", uu_id: @uu.id)	
+					
 				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g1]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
-		    if(params[:g2]!="")
-				gioca2=Gioca.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"D",squadra:"a",uu_id: @uu.id)
-				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g2]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
-		    if(params[:g3]!="")
-				gioca3=Gioca.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"C1",squadra:"a", uu_id: @uu.id)
-				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g3]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
-		    if(params[:g4]!="")
-				gioca4=Gioca.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"C2",squadra:"a", uu_id: @uu.id)
-			  	@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g4]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
-		    if(params[:g5]!="")
-				gioca5=Gioca.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"A",squadra:"a", uu_id: @uu.id)
-				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g5]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)  
-			end
-		    if(params[:g6]!="")
-				gioca6=Gioca.create(user_id: User.find_by(nick: params[:g6]).id,ruolo:"P",squadra:"b", uu_id: @uu.id)
-			    @notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g6]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
-		    if(params[:g7]!="")
-				gioca7=Gioca.create(user_id: User.find_by(nick: params[:g7]).id,ruolo:"D",squadra:"b", uu_id: @uu.id)
-				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g7]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
-		    if(params[:g8]!="")	
-				gioca8=Gioca.create(user_id: User.find_by(nick: params[:g8]).id,ruolo:"C1",squadra:"b", uu_id: @uu.id)
-				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g8]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
-		    if(params[:g9]!="")
-				gioca9=Gioca.create(user_id: User.find_by(nick: params[:g9]).id,ruolo:"C2",squadra:"b", uu_id: @uu.id)
-				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g9]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
-		    if(params[:g10]!="")	
-				gioca10=Gioca.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"A",squadra:"b", uu_id: @uu.id)
-				@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g10]).id )
-				Par.create(match_id: @match.id,notification_id: @notification.id)
-			end
+				Par.create(match_id: @match.id,notification_id: @notification.id,ruolo: "P",squadra:"a")
+				end
+			    if(params[:g2]!="")
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g2]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"D",squadra:"a")
+				end
+			    if(params[:g3]!="")
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g3]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"C1",squadra:"a")
+				end
+			    if(params[:g4]!="")
+				  	@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g4]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"C2",squadra:"a")
+				end
+			    if(params[:g5]!="")
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g5]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"A",squadra:"a")  
+				end
+			    if(params[:g6]!="")
+				    @notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g6]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"P",squadra:"b")
+				end
+			    if(params[:g7]!="")
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g7]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"D",squadra:"b")
+				end
+			    if(params[:g8]!="")	
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g8]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"C1",squadra:"b")
+				end
+			    if(params[:g9]!="")
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g9]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"C2",squadra:"b")
+				end
+			    if(params[:g10]!="")	
+					gioca10=Gioca.create(user_id: User.find_by(nick: params[:g10]).id,ruolo:"A",squadra:"b", uu_id: @uu.id)
+					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g10]).id )
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"A",squadra:"b")
+				end
             elsif(params[:tipo]=="pt")
+            	user=User.find_by(id: params[:user_id])
             	@match=Match.new
             	@pt = Pt.new
             	@pt.match = @match
@@ -290,17 +329,22 @@ class MatchesController < ApplicationController
             	@match.lng=params[:lng]
 		    	@match.tipo=2
 		    	@match.creatore_id=params[:user_id]
+		    	b=false
 		    	params.each do |k,v|
 					if(k[0]=="g" && k[1].to_i<=5)
 						if(v != "")
+							if(user.nick == v)
+								b=true 
+							end
 			  				if(User.find_by(nick: v)==nil) 
 			  					puts "Giocatore #{k} non trovato!" 
 			  					redirect_to user_matches_path current_user
-			  				return
-			  			end
+			  					return
+			  				end
 			  			end
 			    	end
 				end
+
 				if(params[:team]!="")
 					@team = Team.find_by(nome: params[:team])
 					if(@team==nil) 
@@ -308,35 +352,42 @@ class MatchesController < ApplicationController
 						redirect_to user_matches_path current_user
 						return
 			    	end
-			    	@team.pt << @pt
-			    	@team.save
+			    	if(b==false && @team.user.where(id: params[:user_id])[0]==nil)
+			    		puts "Creatore della partita non presente in gioco!" 
+				  		redirect_to user_matches_path current_user
+				  		return
+			    	end
+			    	if(@team.capitano_id.to_i == params[:user_id].to_i)
+			    		
+			    		@team.pt << @pt
+			    		@team.save
+			    	else
+			    		@notification=Notification.create(tipo: 3,data: Time.now,ora: Date.today,msg: "La tua squadra è stata invitata alla seguente partita",sender_id: params[:user_id],receiver_id:@team.capitano_id )
+						Par.create(match_id: @match.id,notification_id: @notification.id,team:params[:team])
+			    	end
 			    end
 		    	@match.save
 				@pt.save
 				if(params[:g1]!="")
-					s1=Squadra.create(user_id: User.find_by(nick: params[:g1]).id,ruolo:"P", pt_id: @pt.id)
 					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g1]).id )
-					Par.create(match_id: @match.id,notification_id: @notification.id)
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"P")
 				end
 		    	if(params[:g2]!="")
-					s2=Squadra.create(user_id: User.find_by(nick: params[:g2]).id,ruolo:"D",pt_id: @pt.id)
 					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g2]).id )
-					Par.create(match_id: @match.id,notification_id: @notification.id)
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"D")
 				end
 		    	if(params[:g3]!="")
-					s3=Squadra.create(user_id: User.find_by(nick: params[:g3]).id,ruolo:"C1", pt_id: @pt.id)
 					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g3]).id )
-					Par.create(match_id: @match.id,notification_id: @notification.id)
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"C1")
 				end
 		    	if(params[:g4]!="")
-					s4=Squadra.create(user_id: User.find_by(nick: params[:g4]).id,ruolo:"C2", pt_id: @pt.id)
 					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g4]).id )
-					Par.create(match_id: @match.id,notification_id: @notification.id)
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"C2")
 				end
 		    	if(params[:g5]!="")
 					s5=Squadra.create(user_id: User.find_by(nick: params[:g5]).id,ruolo:"A", pt_id: @pt.id)
 					@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "Sei stato invitato alla seguente partita",sender_id: params[:user_id],receiver_id:User.find_by(nick: params[:g5]).id )
-					Par.create(match_id: @match.id,notification_id: @notification.id)
+					Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"A")
 				end
             elsif(params[:tipo]=="tt")
             	@match=Match.new
@@ -358,8 +409,10 @@ class MatchesController < ApplicationController
 					else
 						@tt=Tt.create(match_id: @match.id)
 						t = Team.find_by(nome: params[:team1])
-						t.tt << @tt
-						t.save
+						if(t.capitano_id==params[:user_id].to_i)
+			    			t.tt << @tt
+			    			t.save
+			    		end
 					end
             	elsif params[:team1] == ""
             		if(Team.find_by(nome: params[:team2])==nil) 
@@ -369,12 +422,11 @@ class MatchesController < ApplicationController
 					else
 						@tt=Tt.create(match_id: @match.id)
 						t = Team.find_by(nome: params[:team2])
-						t.tt << @tt
-						t.save
-						@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "La tua squadra è stat invitata alla seguente partita",sender_id: params[:user_id],receiver_id:Team.find_by(nome: params[:team1]).capitano_id )
-						Par.create(match_id: @match.id,notification_id: @notification.id)
-						@notification=Notification.create(tipo: 1,data: Time.now,ora: Date.today,msg: "La tua squadra è stata invitata alla seguente partita",sender_id: params[:user_id],receiver_id:Team.find_by(nome: params[:team2]).capitano_id )
-						Par.create(match_id: @match.id,notification_id: @notification.id)
+						if(t.capitano_id==params[:user_id].to_i)
+			    			t.tt << @tt
+			    			t.save
+			    		end
+						
 					end
             	else
             		if(Team.find_by(nome: params[:team2])==nil) 
@@ -388,12 +440,35 @@ class MatchesController < ApplicationController
 							return
 						else
 							@tt=Tt.create(match_id: @match.id)
-							t = Team.find_by(nome: params[:team1])
-							t.tt << @tt
-							t.save
-							t = Team.find_by(nome: params[:team2])
-							t.tt << @tt
-							t.save
+							t1 = Team.find_by(nome: params[:team1])
+							t2 = Team.find_by(nome: params[:team2])
+							b=false
+							if(t1.capitano_id==params[:user_id].to_i)
+								b=true
+							end
+							if(t2.capitano_id==params[:user_id].to_i)
+								b=true
+							end
+							if(b== false)
+								puts "Creatore della partita non presente in gioco!" 
+				  				redirect_to user_matches_path current_user
+				  				return
+							end		
+							if(t1.capitano_id==params[:user_id].to_i)
+				    			t1.tt << @tt
+				    			t1.save
+				    		else
+				    			@notification=Notification.create(tipo: 3,data: Time.now,ora: Date.today,msg: "La tua squadra è stata invitata alla seguente partita",sender_id: params[:user_id],receiver_id:t1.capitano_id )
+								Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"P",team:params[:team1])
+				    		end
+							if(t2.capitano_id==params[:user_id].to_i)
+				    			t2.tt << @tt
+				    			t2.save
+				    		else
+				    			@notification=Notification.create(tipo: 3,data: Time.now,ora: Date.today,msg: "La tua squadra è stata invitata alla seguente partita",sender_id: params[:user_id],receiver_id:t2.capitano_id )
+								Par.create(match_id: @match.id,notification_id: @notification.id,ruolo:"P",team:params[:team2])
+				    		end
+							
 						end
             		end
             	end
