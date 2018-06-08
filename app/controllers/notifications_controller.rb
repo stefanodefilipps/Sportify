@@ -46,8 +46,29 @@ class NotificationsController < ApplicationController
 			puts "Sei stato aggiunto alla squadra #{team.nome}"
 			@notification.destroy
 		elsif @notification.tipo == 1
-			#Qui andrà il codice per gestire l'accetazione di un utente o una squadra a un match
-			
+			@match=Match.find_by(id:@notification.par.match_id)
+			if(@match.uu!=nil)
+				if(@match.uu.user.where(id: @notification.receiver_id)[0] == nil)
+			    	Gioca.create(user_id: @notification.receiver_id,ruolo:@notification.par.ruolo,squadra:@notification.par.squadra, uu_id: @match.uu.id)	
+				end
+			else
+				if(@match.pt.user.where(id: @notification.receiver_id)[0] == nil &&  ( @match.pt.team[0]==nil || @match.pt.team[0].user.where(id: user.id)[0]==nil ))
+					Squadra.create(user_id: @notification.receiver_id,ruolo:@notification.par.ruolo, pt_id: @match.pt.id)
+				end
+			end
+		else
+			@match=Match.find_by(id:@notification.par.match_id)
+			@team=Team.find_by(nome:@notification.par.team)
+			if(@match.pt!=nil)
+			    @team.pt << @match.pt
+			    @team.save
+			else
+				if( (@match.tt.team[0]==nil||@match.tt.team[0].user.where(id: user.id)[0]==nil) && (@match.tt.team[1]==nil||@match.tt.team[1].user.where(id: user.id)[0]==nil))
+				@team.tt << @match.tt
+				@team.save
+				end
+			end
+
 		end
 
 		@notification.destroy
@@ -61,43 +82,10 @@ class NotificationsController < ApplicationController
 			redirect_to user_path current_user
 			return
 		end
-		if @notification.tipo == 2
+		
 			@notification.destroy
 			redirect_to user_path current_user
-		elsif @notification.tipo == 1
-			#codice per gestire un eny quando riguardano dei match
-            @match=Match.find_by(id: @notification.par.match_id)
-			if(@match.uu!=nil)
-			@partita=Gioca.find_by(user_id: @notification.receiver_id,uu_id: @match.uu)
-				if(@partita!=nil) 
-					@partita.destroy
-					@notification.destroy
-					redirect_to user_path current_user
-				end
-			elsif(@match.pt!=nil)
-				@partita=Squadra.find_by(user_id: @notification.receiver_id,pt_id: @match.pt)
-				if(@partita!=nil) 
-					@partita.destroy
-					@notification.destroy
-					redirect_to user_path current_user
-				end
-			end
-		else
-			@match=Match.find_by(id: @notification.par.match_id)
-			if(@match.pt!=nil)
-				@match.pt.team = nil
-				@notification.destroy
-				redirect_to user_path current_user
-			elsif(@match.tt!=nil)
-				if(@match.tt.team[0].capitano_id==@notification.receiver_id)
-					@match.tt.team[0]=nil	
-				elsif(@match.tt.team[1].capitano_id==@notification.receiver_id)
-					@match.tt.team[1]=nil
-				end
-				@notification.destroy
-				redirect_to user_path current_user
-			end
-		end
+		
 	end
 
 end

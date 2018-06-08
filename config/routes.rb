@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   post '/users/:id/matches/:match_id/leavet/:team_id', to: "matches#leaveteam"
   get '/users/:id/matches/:match_id/leavep', to: "matches#leaveplayer"
   get '/users/:id/matches/:match_id/destroy', to: "matches#destroy"
+  get '/users/:id/matches/:match_id/aggiungi', to: "matches#aggiungi"
   post '/users/:id/matches/:match_id/endgame', to: "matches#endgame"
   post '/users/:id/matches/:match_id/rate', to: "matches#rate"
   post 'findplaces', to: "matches#findcourts"
