@@ -4,15 +4,20 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :exception 
 
-  helper_method :current_user, :logged_in?
+  helper_method :current_user, :logged_in?, :require_user
 
   rescue_from CanCan::AccessDenied do |exception|
     if exception.subject.class == Team
       flash[:error] = exception.message
-      redirect_to user_teams_path(current_user.id), :alert => exception.message
-    else
-      redirect_to root_path, :alert => exception.message
+      redirect_to user_teams_path(current_user.id)
+    elsif exception.subject.class == Match
+      flash[:error] = exception.message
+      redirect_to user_matches_path(current_user.id)
+    elsif exception.subject.class == User
+      flash[:error] = exception.message
+      redirect_to user_path(current_user.id)
     end
+      
   end
   
   def current_user

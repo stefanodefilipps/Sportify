@@ -20,5 +20,5 @@ Canard::Abilities.for(:captain) do
   #   can :update, Article, published: true
   #
   # See the wiki for details: https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
-  can [:edit, :update, :destroy, :remove, :captain, :invite], Team, :capitano_id => user.id
+  can [:edit, :update, :destroy, :remove, :captain, :invite, :leaveteam], Team, :capitano_id => user.id
 end

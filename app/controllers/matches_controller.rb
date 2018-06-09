@@ -1,6 +1,7 @@
 class MatchesController < ApplicationController
 
-	skip_before_action :verify_authenticity_token  
+	skip_before_action :verify_authenticity_token 
+	before_action :require_user, except: [:near] 
 
 	def new
 		@user = User.find_by(id: params[:user_id])
@@ -78,11 +79,7 @@ class MatchesController < ApplicationController
 	def show
 		@user = User.find_by id: params[:user_id]
 		@m = Match.find_by id: params[:id]
-		matches = find_all_matches(@user)
-		if matches.count{|ma| ma.id == @m.id} == 0
-			puts "User non partecipa a questa partita"
-			redirect_to user_matches_path current_user
-		end
+		authorize! :show, @m, :message => "Non sei autorizzato a vedere questa partita"
 		if @m.tipo == 1
 			@players = @m.uu.gioca
 		elsif @m.tipo == 2
@@ -177,8 +174,8 @@ class MatchesController < ApplicationController
 				}
 				@matches_tt = Match.within(5, :origin => coordinates).where(tipo: 3).select{|m| 
 					((Date.today <=> m.data) == -1) &&
-					(m.tt.team[0] != nil && !m.tt.team[0].is_in_team?(current_user)) ||
-					(m.tt.team[1] != nil && !m.tt.team[1].is_in_team?(current_user))
+					(m.tt.team[0] == nil && !m.tt.team[1].is_in_team?(current_user)) ||
+					(m.tt.team[1] == nil && !m.tt.team[0].is_in_team?(current_user))
 				}
 
 				@roles_left_uu = Hash.new
@@ -546,6 +543,7 @@ class MatchesController < ApplicationController
 		t=Time.now
 		@user=User.find_by(id: params[:id])
         @m=Match.find_by(id: params[:match_id])
+        authorize! :endgame, @m, :message => "Non sei autorizzato a modificare punteggio di questa partita"
 		if((t<=>@m.data) == 1)
 			@m.punt1=params[:punt1]
 			@m.punt2=params[:punt2]
@@ -561,6 +559,7 @@ class MatchesController < ApplicationController
 		t=Time.now
 		@user = User.find_by(id: params[:id])
         @m=Match.find_by(id: params[:match_id])
+        authorize! :rate, @m, :message => "Non sei autorizzato a votare in questa partita"
 		if((t <=> @m.data) == 1)
 		    array=findplayers(@m)
 		    puts array
@@ -618,7 +617,7 @@ class MatchesController < ApplicationController
     def leaveteam
 		@match=Match.find_by(id: params[:match_id])
 		team=Team.find_by(id:params[:team_id])
-		authorize! :captain, team
+		authorize! :captain, team, :message => "Non sei autorizzato a togliere questa squadra dalla partita"
 		if(@match.pt!=nil)
 			@match.pt.team = []
 		else
@@ -630,17 +629,20 @@ class MatchesController < ApplicationController
 	#abbandona evento come player
 	def leaveplayer
 		@match=Match.find_by(id: params[:match_id])
+		authorize! :leaveplayer, @match, :message => "Non sei autorizzato ad abbandonare questa partita"
 		if(@match.uu!=nil)
 			@partita=Gioca.find_by(user_id: params[:id],uu_id: @match.uu)
 			if(@partita!=nil) 
 				@partita.destroy
 				redirect_to user_matches_path current_user
+				return
 			end
 		else
-			@partita=Squadra.find_by(user_id: params[:user_id],pt_id: @match.pt)
+			@partita=Squadra.find_by(user_id: params[:id],pt_id: @match.pt)
 			if(@partita!=nil) 
 				@partita.destroy
 				redirect_to user_matches_path current_user
+				return;
 			end
 		end
 		redirect_to user_matches_path current_user
@@ -650,7 +652,7 @@ class MatchesController < ApplicationController
 		@user = User.find_by(id: params[:id])
 		@user_2 = User.find_by(id: params[:user_id_2])
 		@m = Match.find_by(id: params[:match_id])
-		authorize! :deleteplayer, @m
+		authorize! :deleteplayer, @m, :message => "Non sei autorizzato a eliminare questo utente da questa partita"
 		if @m.tipo == 1
 			gioca = @m.uu.gioca.where(user_id: @user_2.id)[0].destroy
 		else
@@ -662,7 +664,7 @@ class MatchesController < ApplicationController
 		@user = User.find_by(id: params[:id])
 		@m = Match.find_by(id: params[:match_id])
 		team = Team.find_by(id: params[:team_id])
-		authorize! :deleteteam, @m
+		authorize! :deleteteam, @m, :message => "Non sei autorizzato a eliminare questa squadra da questa partita"
 		if(@m.pt!=nil)
 			@m.pt.team = []
 		else
@@ -673,6 +675,7 @@ class MatchesController < ApplicationController
 	#cancella partita
 	def destroy
 		@match=Match.find_by(id: params[:id])
+		authorize! :destroy, @m, :message => "Non sei autorizzato a distruggere questa partita"
 		@match.destroy
 		redirect_to user_matches_path current_user
 	end
@@ -711,7 +714,11 @@ class MatchesController < ApplicationController
 
 	def find_coordinates(address, city)
 
-		response = HTTParty.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+','+city+'&key=AIzaSyBrpRP5ZOFLfXt3NWpQIuat4zTSlQeFUbU')
+		if city
+			response = HTTParty.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+','+city+'&key=AIzaSyBrpRP5ZOFLfXt3NWpQIuat4zTSlQeFUbU')
+		else
+			response = HTTParty.get('https://maps.googleapis.com/maps/api/geocode/json?address='+address+'&key=AIzaSyBrpRP5ZOFLfXt3NWpQIuat4zTSlQeFUbU')
+		end
 		results = Array.new
 		if response.code != 200
 			results.insert(0,response.code)

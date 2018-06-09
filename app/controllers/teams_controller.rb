@@ -2,6 +2,7 @@ class TeamsController < ApplicationController
 
 	#before_action :inizializza_flash
 	skip_before_action :verify_authenticity_token
+	before_action :require_user
 
 	def new
 		@team = Team.new
@@ -155,7 +156,7 @@ class TeamsController < ApplicationController
 			redirect_to user_teams_path(current_user.id)
 			return
 		end
-		authorize! :show,@team, :message => "Non sei autorizzato a vedere questa partita"
+		authorize! :show,@team, :message => "Non sei autorizzato a vedere questo team"
 	end
 
 	def edit

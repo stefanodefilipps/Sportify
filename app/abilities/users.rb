@@ -24,4 +24,10 @@ Canard::Abilities.for(:user) do
     t.user.where(id: user.id)[0]
   end
   can [:accept, :deny], Notification, :receiver_id => user.id
+
+  can [:show, :rate, :leaveplayer], Match do |m|
+    m.is_in_match? user
+  end
+
+  can [:show, :updateD, :updateR], User, :id => user.id
 end

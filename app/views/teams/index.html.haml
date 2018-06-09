@@ -42,11 +42,14 @@
         .container.user_column
           %p.user_column_obj
             %b#val Valutazione:
-            - if @user.voto != nil
+            - if @user.voto != 0
               = (@user.voto/@user.tot).round(1)
+            - else
+              0
         .container.user_column
           %a.user_column_obj{:href => "#"}
-            %b Teams
+            %b
+              = link_to "Teams", user_teams_path(@user)
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b 

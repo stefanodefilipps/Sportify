@@ -1,4 +1,7 @@
 class NotificationsController < ApplicationController
+
+	before_action :require_user
+	
 	def index
 		@notifications = Notification.where(receiver_id: current_user.id)
 	end
@@ -63,7 +66,7 @@ class NotificationsController < ApplicationController
 			    @team.pt << @match.pt
 			    @team.save
 			else
-				if( (@match.tt.team[0]==nil||@match.tt.team[0].user.where(id: user.id)[0]==nil) && (@match.tt.team[1]==nil||@match.tt.team[1].user.where(id: user.id)[0]==nil))
+				if( (@match.tt.team[0]==nil||@match.tt.team[0].user.where(id: current_user.id)[0]==nil) && (@match.tt.team[1]==nil||@match.tt.team[1].user.where(id: current_user.id)[0]==nil))
 				@team.tt << @match.tt
 				@team.save
 				end

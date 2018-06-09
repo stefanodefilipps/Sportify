@@ -155,14 +155,17 @@
                 -else
                   .row
                     .col-12
-                      =message.msg
-                  .row
+                      .container
+                        = message.msg
+                  .row{:style => "margin-top: 3%"}
                     .col-6
-                      = form_tag "/notifications/#{message.id}/accept", method: "get" do
-                        %input{:type => "submit", :value => "accept",class: "btn btn-primary"}/
+                      .container
+                        = form_tag "/notifications/#{message.id}/accept", method: "get" do
+                          %input{:type => "submit", :value => "accept",class: "btn btn-primary"}/
                     .col-6
-                      = form_tag "/notifications/#{message.id}/deny", method: "get" do
-                        %input{:type => "submit", :value => "deny",class: "btn btn-primary"}/
+                      .container
+                        = form_tag "/notifications/#{message.id}/deny", method: "get" do
+                          %input{:type => "submit", :value => "deny",class: "btn btn-primary"}/
 
                   
                   

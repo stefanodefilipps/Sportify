@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
 
+	before_action :require_user, except: [:new, :create]
+
 	#questo mi deve dare la form per creare un nuovo utente
 	def new
 		 @user = User.new		#lo devo passare nella form per la create
@@ -7,6 +9,7 @@ class UsersController < ApplicationController
 
 	def show
 		@user = User.find_by(id: params[:id])
+		authorize! :show, @user, :message => "Non sei autorizzato a vedere questo profilo"
 		if(@user.voto != nil && @user.voto != 0)
 			@rate=@user.voto / @user.tot
 		else 
@@ -41,23 +44,25 @@ class UsersController < ApplicationController
 	
 
 	def updateD
-		user=User.find_by(id: params[:id])
-		user.desc=params[:desc]
-		user.save
+		@user=User.find_by(id: params[:id])
+		authorize! :updateD, user, :message => "Non sei autorizzato a cambiare questa descrizione"
+		@user.desc=params[:desc]
+		@user.save
 	    redirect_to "/users/#{user.id}"
 
 	end
 	def updateR
 		i=0
-		user=User.find_by(id: params[:id])
+		@user=User.find_by(id: params[:id])
+		authorize! :show, @user, :message => "Non sei autorizzato a impostare ruoli di questo profilo"
 		params.each do |k,v|
 			if(v=="on" && i==0)
-				user.ruolo1=k
-				user.save
+				@user.ruolo1=k
+				@user.save
 				i=1
 			elsif(v=="on" && i==1)
-				user.ruolo2=k
-				user.save
+				@user.ruolo2=k
+				@user.save
 			end
 
 		end
@@ -103,8 +108,8 @@ class UsersController < ApplicationController
 
 	def search
 		@user = User.find_by(id: params[:user_id])
-		if params[:nome].split(" ")[1]
-			@array = User.where(nome: params[:nome].split(" ")[0], cognome: params[:nome].split(" ")[1])
+		if params[:nome].split(" ",1)[1]
+			@array = User.where(nome: params[:nome].split(" ")[0], cognome: params[:nome].split(" ",1)[1])
 			return
 		end
 		@array = User.where(nome: params[:nome].split(" ")[0])
@@ -113,6 +118,6 @@ class UsersController < ApplicationController
 	private
 
 	def user_params
-		params.require(:user).permit(:nick,ruolo1: [])		# Questa funxione mi serve altrimenti non posso fare mass assignment
+		params.require(:user).permit(:nick,ruolo1: [])		# Questa funzione mi serve altrimenti non posso fare mass assignment
 	end
 end

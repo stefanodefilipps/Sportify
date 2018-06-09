@@ -27,6 +27,24 @@ class Match < ApplicationRecord
 		return !n.empty?
 	end
 
+	def is_in_match?(user)
+		if self.uu
+			return !self.uu.gioca.where(user_id: user.id).empty?
+		elsif self.pt
+			if self.pt.team[0]
+				return self.pt.team[0].is_in_team? user
+			else
+				return !self.pt.squadra.where(user_id: user.id).empty?
+			end
+		else
+			bool = false
+			self.tt.team.each do |t|
+				bool = (bool || (t.is_in_team?user))
+			end
+			return bool
+		end
+	end
+
 
 	
 end

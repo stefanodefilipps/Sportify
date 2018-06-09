@@ -46,10 +46,12 @@
               0
         .container.user_column
           %a.user_column_obj{:href => "#"}
-            %b Teams
+            %b
+              = link_to "Teams", user_teams_path(@user)
         .container.user_column
           %a.user_column_obj{:href => "#"}
-            %b Logout
+            %b 
+              = link_to "Logout", logout_path, method: :delete
         .container.user_column
           = form_tag "/users/#{@user.id}/search", method: "get" do
             %input.form-control{:name => "nome", :placeholder => "Cerca utente", :type => ""}/
