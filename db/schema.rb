@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180608074936) do
+ActiveRecord::Schema.define(version: 20180610175501) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -123,6 +123,7 @@ ActiveRecord::Schema.define(version: 20180608074936) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["capitano_id"], name: "index_teams_on_capitano_id"
+    t.index ["nome"], name: "index_teams_on_nome", unique: true
   end
 
   create_table "teams_tts", id: false, force: :cascade do |t|
@@ -153,6 +154,7 @@ ActiveRecord::Schema.define(version: 20180608074936) do
     t.string "token"
     t.integer "roles_mask"
     t.integer "tot"
+    t.index ["nick"], name: "index_users_on_nick", unique: true
   end
 
   create_table "uus", force: :cascade do |t|

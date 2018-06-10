@@ -54,16 +54,27 @@
               = link_to "Logout", logout_path, method: :delete
         .container.user_column
           = form_tag "/users/#{@user.id}/search", method: "get" do
-            %input.form-control{:name => "nome", :placeholder => "Cerca utente", :type => ""}/
-            %button.btn.btn-outline-dark{:type => "submit"}
-              %i.fas.fa-search
-      .col-2
-      .col-6
+            .row
+              .col-12
+                .row
+                  %input.form-control{:name => "nome", :placeholder => "Cerca utente", :type => "", :style => "width: 80%;"}/
+                  %button.btn.btn-outline-dark{:type => "submit"}
+                    %i.fas.fa-search
+      - if @array.empty?
         .row
-          %p{:style => "font-size: 35px"}
-            %b Utenti trovati
-      
-        - @array.each do |u|
+          .col-2
+          .col-6
+            .container{:style => "margin-top: 50%; margin-left: 50%;"}
+              .alert.alert-danger{:role => "alert"}
+                Nessun utente trovato con il nome specificato
+      - else
+        .col-2
+        .col-6
           .row
-            %input.form-control{:name => "cercautente", disabled: true, :style => "width: 50%", :type => "", :value => "Nome: #{u.nome}  Cognome: #{u.cognome}  Nick: #{u.nick}"}/
-            %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/show/#{u.id}"} Vedi Profilo    
+            %p{:style => "font-size: 35px"}
+              %b Utenti trovati
+        
+          - @array.each do |u|
+            .row
+              %input.form-control{:name => "cercautente", disabled: true, :style => "width: 50%", :type => "", :value => "Nome: #{u.nome}  Cognome: #{u.cognome}  Nick: #{u.nick}"}/
+              %a.btn.btn-outline-dark{ :href => "/users/#{@user.id}/show/#{u.id}"} Vedi Profilo    

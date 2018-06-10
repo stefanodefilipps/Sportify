@@ -43,7 +43,7 @@ class TeamsController < ApplicationController
 					begin 										#provo a salvare membro ma devo controllare che l'user non sia gia presente nella squadra altrimenti postgres
 						mem = mem.save							#mi lancia l'errore che il record non è unico e quindi se si verifica in questo punto devo cancellare la squadra
 					rescue ActiveRecord::RecordNotUnique => e
-						flash[:error_cd] ="Creazione Team fallita, utente presente più volte o due utenti con stesso ruolo"
+						flash[:error_cd] ="Creazione Team fallita, possibili cause: \n utente presente più volte \n Due utenti con stesso ruolo \n Nome squadra già in uso"
 						@team.destroy
 						redirect_to user_teams_path(current_user.id)
 						return
@@ -105,15 +105,22 @@ class TeamsController < ApplicationController
 				#end
 			end
 		end
-		if @team.save
-			@capitano.roles << :captain
-			if @capitano.save
-				flash[:success_cd] = "Nuova squadra creata con successo"
-				redirect_to user_teams_path(current_user.id)
-				return
+		begin
+			if @team.save
+				@capitano.roles << :captain
+				if @capitano.save
+					flash[:success_cd] = "Nuova squadra creata con successo"
+					redirect_to user_teams_path(current_user.id)
+					return
+				end
 			end
+		rescue ActiveRecord::RecordNotUnique => e
+			flash[:error_cd] ="Creazione Team fallita, nome squadra gia presente"
+			@team.destroy
+			redirect_to user_teams_path(current_user.id)
+			return
 		end
-		flash[:error_cd] = "problemi nella creazione della squadra"
+		flash[:error_cd] = "Nome non presente, impossibile creare la squadra"
 		redirect_to user_teams_path(current_user.id)
 	end
 

@@ -32,10 +32,10 @@ class Match < ApplicationRecord
 			return !self.uu.gioca.where(user_id: user.id).empty?
 		elsif self.pt
 			if self.pt.team[0]
-				return self.pt.team[0].is_in_team? user
-			else
-				return !self.pt.squadra.where(user_id: user.id).empty?
+				return ((self.pt.team[0].is_in_team?user) || (!self.pt.squadra.where(user_id: user.id).empty?))
 			end
+
+			!self.pt.squadra.where(user_id: user.id).empty?
 		else
 			bool = false
 			self.tt.team.each do |t|

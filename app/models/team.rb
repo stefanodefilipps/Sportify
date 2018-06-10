@@ -1,5 +1,6 @@
 class Team < ApplicationRecord
 	validate :in_range
+	validates :nome, presence: true
 	has_many :membro, dependent: :delete_all, autosave: true  #per cancellare dal db a cascata devo usare il metodo team.destroy e non team.delete altrimenti non cancella oggetti associati
 	has_many :user, through: :membro
 	belongs_to :capitano, class_name: "User"

@@ -19,6 +19,10 @@
       %li
         = link_to "Accedi con facebook",user_facebook_omniauth_authorize_path
     #container
+      - if flash[:error_cd]
+        .container
+          .alert.alert-danger{:role => "alert", :style => "width: 40%; margin-left: 30%;"}
+            = flash[:error_cd]
       #image.row.align-items-center
         .col
         .col

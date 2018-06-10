@@ -45,10 +45,10 @@ class UsersController < ApplicationController
 
 	def updateD
 		@user=User.find_by(id: params[:id])
-		authorize! :updateD, user, :message => "Non sei autorizzato a cambiare questa descrizione"
+		authorize! :updateD, @user, :message => "Non sei autorizzato a cambiare questa descrizione"
 		@user.desc=params[:desc]
 		@user.save
-	    redirect_to "/users/#{user.id}"
+	    redirect_to "/users/#{@user.id}"
 
 	end
 	def updateR
@@ -66,7 +66,7 @@ class UsersController < ApplicationController
 			end
 
 		end
-	    redirect_to "/users/#{user.id}"
+	    redirect_to "/users/#{@user.id}"
 
 	end
 	
@@ -76,8 +76,8 @@ class UsersController < ApplicationController
 		puts par["nick"]
 		puts par["ruolo1"][0]
 		@user = User.find_by(uid: session["uid"])
-		session["uid"] = nil
-		session["user_id"] = @user_id
+		session[:uid] = nil
+		session[:user_id] = @user.id
 		@user.nick = par["nick"]
 		if par["ruolo1"].length == 1
 			@user.ruolo1 = par["ruolo1"][0]
@@ -88,9 +88,19 @@ class UsersController < ApplicationController
 		@user.voto = 0
 		@user.desc = ""
 		@user.tot = 0
-		if @user.save
-			puts "Nuovo utente creato"
-			redirect_to user_matches_path @user
+		begin
+			if @user.save
+				puts "Nuovo utente creato"
+				redirect_to user_matches_path @user
+				return
+			end
+		rescue ActiveRecord::RecordNotUnique => e
+			flash[:error_cd] ="Creazione Utente fallita, nickname gia in uso"
+			token = @user.token
+		    session[:user_id] = nil
+		    @user.destroy
+		    redirection_url = "https://localhost:3000/"
+		    redirect_to "https://www.facebook.com/logout.php?next=#{redirection_url}&access_token=#{token}"
 			return
 		end
 		redirect_to root_path
@@ -109,10 +119,11 @@ class UsersController < ApplicationController
 	def search
 		@user = User.find_by(id: params[:user_id])
 		if params[:nome].split(" ",1)[1]
-			@array = User.where(nome: params[:nome].split(" ")[0], cognome: params[:nome].split(" ",1)[1])
+			@array = User.where(nome: params[:nome].split(" ")[0], cognome: params[:nome].split(" ",1)[1]).or(User.where(nick: params[:nome].split(" ")[0] ))
+			#@array = User.where(nome: params[:nome].split(" ")[0], cognome: params[:nome].split(" ",1)[1])
 			return
 		end
-		@array = User.where(nome: params[:nome].split(" ")[0])
+		@array = User.where(nome: params[:nome].split(" ")[0]).or(User.where(nick: params[:nome].split(" ")[0] ))
 	end
 
 	private

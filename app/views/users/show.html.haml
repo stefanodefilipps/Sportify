@@ -50,6 +50,9 @@
           %br/
           %br/
           %br/
+          %b{:style => "font-size: 25px"} Descrizione
+          %br/
+          %br/
           .form-group
             = form_tag "/users/#{@user.id}/updateD", method: "post" do
               = text_area_tag "desc",nil, class: "form-control", placeholder: @user.desc, :rows =>"3", autofocus: true

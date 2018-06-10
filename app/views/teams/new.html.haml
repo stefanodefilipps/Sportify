@@ -40,33 +40,35 @@
         .container.user_column
           %p.user_column_obj
             %b#val Valutazione:
-            - if @user.voto != nil
+            - if @user.voto != 0
               = (@user.voto/@user.tot).round(1)
+            - else
+              0
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b Teams
         .container.user_column
           %a.user_column_obj{:href => "#"}
             %b Logout
-    #center
+    #center{:style => "margin-left: 13.5%;"}
       %p
         %b Crea Squadra
         
-    #formteam
+    #formteam{:style => "margin-left: 15%; width: 13%;"}
       = form_tag "/users/#{@user.id}/teams", method: "post" do
         .form-group
-          = text_field_tag "P",nil, class: "form-control", placeholder: "Nickname portiere", autofocus: true
+          = text_field_tag "P",nil, class: "form-control", :style => "width: 100%;", placeholder: "Nickname portiere", autofocus: true
         .form-group
-          = text_field_tag "D",nil, class: "form-control", placeholder: "Nickname difensore", autofocus: true
+          = text_field_tag "D",nil, class: "form-control", :style => "width: 100%;", placeholder: "Nickname difensore", autofocus: true
         .form-group
-          = text_field_tag "C1",nil, class: "form-control", placeholder: "Nickname centrocampista 1", autofocus: true
+          = text_field_tag "C1",nil, class: "form-control", :style => "width: 100%;", placeholder: "Nickname centrocampista 1", autofocus: true
         .form-group
-          = text_field_tag "C2",nil, class: "form-control", placeholder: "Nickname centrocampista 2", autofocus: true
+          = text_field_tag "C2",nil, class: "form-control", :style => "width: 100%;", placeholder: "Nickname centrocampista 2", autofocus: true
         .form-group
-          = text_field_tag "A",nil, class: "form-control", placeholder: "Nickname attaccante", autofocus: true
+          = text_field_tag "A",nil, class: "form-control", :style => "width: 100%;", placeholder: "Nickname attaccante", autofocus: true
         #nameteam
         .form-group
-          = text_field_tag "nome",nil, class: "form-control", placeholder: "Nome della squadra", autofocus: true
+          = text_field_tag "nome",nil, class: "form-control", :style => "width: 100%;", placeholder: "Nome della squadra", autofocus: true
         #savebutt
         .form-group
           = submit_tag "Crea Squadra", class: "btn btn-primary mb-2"

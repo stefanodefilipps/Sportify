@@ -46,7 +46,6 @@ class NotificationsController < ApplicationController
 				mem.destroy
 				redirect_to user_path current_user
 			end
-			puts "Sei stato aggiunto alla squadra #{team.nome}"
 			@notification.destroy
 		elsif @notification.tipo == 1
 			@match=Match.find_by(id:@notification.par.match_id)

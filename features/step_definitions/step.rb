@@ -42,7 +42,7 @@ end
 
 Given("I am on the team index page") do
   if !@user
-    @user = create(:user, roles: :captain)
+    @user = create(:user, roles: :captain, voto: 0, tot: 0)
   end
   page.set_rack_session(user_id: @user.id)
   visit user_teams_path(@user)

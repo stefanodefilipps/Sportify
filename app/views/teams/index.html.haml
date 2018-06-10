@@ -69,24 +69,35 @@
               #success.container{:style => "margin-top: 10%"}
                 .alert.alert-success{:role => "alert"}
                   = flash[:success_cd]
-        .row{:style => "margin-top: 15%"}
-          .col-3{:style => "margin-left: 20%"}
-            %i.fas.fa-futbol.fa-5x{:style => "padding-right: 3%"}
-            %i.fas.fa-users.fa-5x
-          .col-4
-            .container.text-team Le mie squadre
-        - @teams.each do |t|
+        - if @teams.empty?
           .row
+            .col-4
+            .col-4
+              .container{:style => "margin-top: 50%"}
+                .alert.alert-danger{:role => "alert"}
+                  Non partecipi a nessuna Squadra
+          .row{ :style => "margin-top: 5%; margin-left: 40%" }
             .container
-              .card.index-teams{:style => "width: 50rem;"}
-                .card-body.prova{:id => "#{t.id}_1"}
-                  %h5.card-title Squadra
-                  %p.card-text 
-                    = t.nome
-                  = link_to "Mostra Squadra", user_team_path(@user,t), :remote => true, class: "btn btn-primary"
-        .row{ :style => "margin-top: 5%; margin-left: 40%" }
-          .container
-            = link_to "Crea Squadra", new_user_team_path(@user), class: "btn btn-primary"
+              = link_to "Crea Squadra", new_user_team_path(@user), class: "btn btn-primary"
+        - else
+          .row{:style => "margin-top: 15%"}
+            .col-3{:style => "margin-left: 20%"}
+              %i.fas.fa-futbol.fa-5x{:style => "padding-right: 3%"}
+              %i.fas.fa-users.fa-5x
+            .col-4
+              .container.text-team Le mie squadre
+          - @teams.each do |t|
+            .row
+              .container
+                .card.index-teams{:style => "width: 50rem;"}
+                  .card-body.prova{:id => "#{t.id}_1"}
+                    %h5.card-title Squadra
+                    %p.card-text 
+                      = t.nome
+                    = link_to "Mostra Squadra", user_team_path(@user,t), :remote => true, class: "btn btn-primary"
+          .row{ :style => "margin-top: 5%; margin-left: 40%" }
+            .container
+              = link_to "Crea Squadra", new_user_team_path(@user), class: "btn btn-primary"
         
         
 

@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
       flash[:error] = exception.message
       redirect_to user_teams_path(current_user.id)
     elsif exception.subject.class == Match
-      flash[:error] = exception.message
+      flash[:error] = exception.message 
       redirect_to user_matches_path(current_user.id)
     elsif exception.subject.class == User
       flash[:error] = exception.message

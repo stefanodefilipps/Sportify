@@ -30,130 +30,143 @@
           .col-3
             %a{:href => "/users/#{current_user.id}/matches"}
               %b Home
-      .col-6
+        - if !logged_in?
+          .col-3
+          .col-3
+          .col-3
+            = link_to "Accedi con facebook",user_facebook_omniauth_authorize_path, class: "btn btn-outline-success my-2 my-sm-0", :style => "margin-left: 50%;"
+      - if @matches_uu.empty? && @matches_pt.empty? && @matches_tt.empty?
         .row
-          - @matches_uu.each do |m_uu|
-            .container
-              .card.index-teams{:style => "width: 50rem;"}
-                .card-body.prova{:id => "#{m_uu.id}_1"}
-                  %h5.card-title
-                    Match
-                    %p.card-text
-                      .row
-                        .col-3
-                          Creatore Evento:
-                        .col.3
-                          Data:
-                        .col-3
-                          Campetto:
-                        .col-3
-                          Ora:
-                      .row{:style => "margin-top: 0.9%"}
-                        .col-3
-                          = m_uu.creatore.nick
-                        .col-3
-                          = m_uu.data
-                        .col-3
-                          = m_uu.campo
-                        .col-3
-                          = m_uu.ora.strftime("%H:%M")
-                      .row{:style => "margin-top: 5%"}
-                        .col-3
-                          Ruoli disponibili:
-                      .row{:style => "margin-top: 0.9%"}
-                        - @roles_left_uu["#{m_uu.id}"].each do |r|
+          .col-2
+          .col-6{:style => "margin-left: 53%;"}
+            .container{:style => "margin-top: 50%"}
+              .alert.alert-danger{:role => "alert"}
+                Nessun Match trovato nelle vicinanze del luogo specificato
+      - else
+        .col-2
+        .col-6{:style => "margin-left: 3%;"}
+          .row
+            - @matches_uu.each do |m_uu|
+              .container
+                .card.index-teams{:style => "width: 50rem;"}
+                  .card-body.prova{:id => "#{m_uu.id}_1"}
+                    %h5.card-title
+                      Match: Players VS Players
+                      %p.card-text
+                        .row
                           .col-3
-                            - if logged_in?
-                              = form_tag "/users/#{current_user.id}/matches/#{m_uu.id}/aggiungi", method: "post" do
-                                = text_field_tag "squadra",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r[0]}"
-                                = text_field_tag "ruolo",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r[1,r.length-1]}"
-                                =  submit_tag "#{r[1]} in #{r[0]}", class: "btn btn-primary"
-                            - else
-                              = link_to "#{r[1]} in #{r[0]}",user_facebook_omniauth_authorize_path, :class => "btn btn-danger mb-2"
-          - @matches_pt.each do |m_pt|
-            .container
-              .card.index-teams{:style => "width: 50rem;"}
-                .card-body.prova{:id => "#{m_pt.id}_1"}
-                  %h5.card-title
-                    Match
-                    %p.card-text
-                      .row
-                        .col-3
-                          Creatore Evento:
-                        .col.3
-                          Data:
-                        .col-3
-                          Campetto:
-                        .col-3
-                          Ora:
-                      .row{:style => "margin-top: 0.9%"}
-                        .col-3
-                          = m_pt.creatore.nick
-                        .col-3
-                          = m_pt.data
-                        .col-3
-                          = m_pt.campo
-                        .col-3
-                          = m_pt.ora.strftime("%H:%M")
-                      - if !@roles_left_pt["#{m_pt.id}"].empty?
+                            Creatore Evento:
+                          .col.3
+                            Data:
+                          .col-3
+                            Campetto:
+                          .col-3
+                            Ora:
+                        .row{:style => "margin-top: 0.9%"}
+                          .col-3
+                            = m_uu.creatore.nick
+                          .col-3
+                            = m_uu.data
+                          .col-3
+                            = m_uu.campo
+                          .col-3
+                            = m_uu.ora.strftime("%H:%M")
                         .row{:style => "margin-top: 5%"}
                           .col-3
                             Ruoli disponibili:
                         .row{:style => "margin-top: 0.9%"}
-                          - @roles_left_pt["#{m_pt.id}"].each do |r|
+                          - @roles_left_uu["#{m_uu.id}"].each do |r|
                             .col-3
                               - if logged_in?
-                                = form_tag "/users/#{current_user.id}/matches/#{m_pt.id}/aggiungi", method: "post" do
-                                  = text_field_tag "ruolo",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r}"
-                                  = text_field_tag "team",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: ""
-                                  =  submit_tag "#{r}", class: "btn btn-primary"
+                                = form_tag "/users/#{current_user.id}/matches/#{m_uu.id}/aggiungi", method: "post" do
+                                  = text_field_tag "squadra",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r[0]}"
+                                  = text_field_tag "ruolo",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r[1,r.length-1]}"
+                                  =  submit_tag "#{r[1]} in #{r[0]}", class: "btn btn-primary"
                               - else
-                                = link_to "#{r}",user_facebook_omniauth_authorize_path, :class => "btn btn-danger mb-2"
-                      - if (m_pt.pt.team.empty?) && (!m_pt.is_waiting_response_for_team)
+                                = link_to "#{r[1]} in #{r[0]}",user_facebook_omniauth_authorize_path, :class => "btn btn-danger mb-2"
+            - @matches_pt.each do |m_pt|
+              .container
+                .card.index-teams{:style => "width: 50rem;"}
+                  .card-body.prova{:id => "#{m_pt.id}_1"}
+                    %h5.card-title
+                      Match: Players VS Team
+                      %p.card-text
+                        .row
+                          .col-3
+                            Creatore Evento:
+                          .col.3
+                            Data:
+                          .col-3
+                            Campetto:
+                          .col-3
+                            Ora:
+                        .row{:style => "margin-top: 0.9%"}
+                          .col-3
+                            = m_pt.creatore.nick
+                          .col-3
+                            = m_pt.data
+                          .col-3
+                            = m_pt.campo
+                          .col-3
+                            = m_pt.ora.strftime("%H:%M")
+                        - if !@roles_left_pt["#{m_pt.id}"].empty?
+                          .row{:style => "margin-top: 5%"}
+                            .col-3
+                              Ruoli disponibili:
+                          .row{:style => "margin-top: 0.9%"}
+                            - @roles_left_pt["#{m_pt.id}"].each do |r|
+                              .col-3
+                                - if logged_in?
+                                  = form_tag "/users/#{current_user.id}/matches/#{m_pt.id}/aggiungi", method: "post" do
+                                    = text_field_tag "ruolo",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: "#{r}"
+                                    = text_field_tag "team",nil, class: "form-control", placeholder: "Inserisci indirizzo", autofocus: true, :style => "display: none", value: ""
+                                    =  submit_tag "#{r}", class: "btn btn-primary"
+                                - else
+                                  = link_to "#{r}",user_facebook_omniauth_authorize_path, :class => "btn btn-danger mb-2"
+                        - if (m_pt.pt.team.empty?) && (!m_pt.is_waiting_response_for_team)
+                          .row{:style => "margin-top: 5%"}
+                            .col-12
+                              - if logged_in?
+                                = form_tag "/users/#{current_user.id}/matches/#{m_pt.id}/aggiungi", method: "post" do
+                                  = text_field_tag "team",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
+                                  = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
+                              - else
+                                = form_tag "/user/auth/facebook", method: "get" do
+                                  = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
+                                  = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
+            - @matches_tt.each do |m_tt|
+              .container
+                .card.index-teams{:style => "width: 50rem;"}
+                  .card-body.prova{:id => "#{m_tt.id}_1"}
+                    %h5.card-title
+                      Match: Team VS Team
+                      %p.card-text
+                        .row
+                          .col-3
+                            Creatore Evento:
+                          .col.3
+                            Data:
+                          .col-3
+                            Campetto:
+                          .col-3
+                            Ora:
+                        .row{:style => "margin-top: 0.9%"}
+                          .col-3
+                            = m_tt.creatore.nick
+                          .col-3
+                            = m_tt.data
+                          .col-3
+                            = m_tt.campo
+                          .col-3
+                            = m_tt.ora.strftime("%H:%M")
                         .row{:style => "margin-top: 5%"}
                           .col-12
-                            - if logged_in?
-                              = form_tag "/users/#{current_user.id}/matches/#{m_pt.id}/aggiungi", method: "post" do
+                            - if (logged_in?) && (!m_tt.is_waiting_response_for_team)
+                              = form_tag "/users/#{current_user.id}/matches/#{m_tt.id}/aggiungi", method: "post" do
                                 = text_field_tag "team",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
                                 = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
                             - else
                               = form_tag "/user/auth/facebook", method: "get" do
                                 = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
                                 = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
-          - @matches_tt.each do |m_tt|
-            .container
-              .card.index-teams{:style => "width: 50rem;"}
-                .card-body.prova{:id => "#{m_tt.id}_1"}
-                  %h5.card-title
-                    Match
-                    %p.card-text
-                      .row
-                        .col-3
-                          Creatore Evento:
-                        .col.3
-                          Data:
-                        .col-3
-                          Campetto:
-                        .col-3
-                          Ora:
-                      .row{:style => "margin-top: 0.9%"}
-                        .col-3
-                          = m_tt.creatore.nick
-                        .col-3
-                          = m_tt.data
-                        .col-3
-                          = m_tt.campo
-                        .col-3
-                          = m_tt.ora.strftime("%H:%M")
-                      .row{:style => "margin-top: 5%"}
-                        .col-12
-                          - if (logged_in?) && (!m_tt.is_waiting_response_for_team)
-                            = form_tag "/users/#{current_user.id}/matches/#{m_tt.id}/aggiungi", method: "post" do
-                              = text_field_tag "team",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
-                              = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
-                          - else
-                            = form_tag "/user/auth/facebook", method: "get" do
-                              = text_field_tag "squadra",nil, class: "form-control mb-2 mr-sm-2", placeholder: "Aggiungi squadra", autofocus: true, :style => "width: 48%"
-                              = submit_tag "Aggiungi", class: "btn btn-primary mb-2", :style => "margin-left: 3%"
-      .col-6
-        #maps{:style => "width: 500px; height: 600px"}
+        .col-3

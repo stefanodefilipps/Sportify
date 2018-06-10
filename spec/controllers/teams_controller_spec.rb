@@ -413,7 +413,7 @@ RSpec.describe TeamsController, type: :controller do
 			@user.save
 			@giorgio = User.new(nick: "cogiorgio", roles: [:captain])
 			@giorgio.save 
-			@team = Team.new(capitano_id: @user.id, nome: "prova2")
+			@team = Team.new(capitano_id: @user.id, nome: "prova")
 	    	membro = Membro.new(ruolo: "P")
 	    	membro.team = @team
 	    	membro.user = @user

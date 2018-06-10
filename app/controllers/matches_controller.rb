@@ -77,8 +77,12 @@ class MatchesController < ApplicationController
 	end
 
 	def show
+		puts "CAZZOOOOOOOOOOOOOOOO"
 		@user = User.find_by id: params[:user_id]
 		@m = Match.find_by id: params[:id]
+		puts @m.pt.team[0].is_in_team?@user
+		puts !@m.pt.squadra.where(user_id: @user.id).empty?
+		puts can? :show, @m
 		authorize! :show, @m, :message => "Non sei autorizzato a vedere questa partita"
 		if @m.tipo == 1
 			@players = @m.uu.gioca
@@ -470,6 +474,8 @@ class MatchesController < ApplicationController
 						if(t.capitano_id==params[:user_id].to_i)
 			    			t.tt << @tt
 			    			t.save
+			    		else
+			    			@match.destroy
 			    		end
 					end
             	elsif params[:team1] == ""
@@ -483,8 +489,9 @@ class MatchesController < ApplicationController
 						if(t.capitano_id==params[:user_id].to_i)
 			    			t.tt << @tt
 			    			t.save
+			    		else
+			    			@match.destroy
 			    		end
-						
 					end
             	else
             		if(Team.find_by(nome: params[:team2])==nil) 
@@ -509,6 +516,7 @@ class MatchesController < ApplicationController
 							end
 							if(b== false)
 								puts "Creatore della partita non presente in gioco!" 
+								@match.destroy
 				  				redirect_to user_matches_path current_user
 				  				return
 							end		
@@ -599,12 +607,12 @@ class MatchesController < ApplicationController
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
     m=Match.find_by(id: session[:match_id])
-    start = DateTime.new(m.data.year,m.data.month,m.data.day,m.ora.hour,m.ora.min)
-    finish = DateTime.new(m.data.year,m.data.month,m.data.day,m.ora.hour+1,m.ora.min)
+    start = DateTime.new(m.data.year,m.data.month,m.data.day,m.ora.hour-2,m.ora.min)
+    finish = DateTime.new(m.data.year,m.data.month,m.data.day,m.ora.hour-1,m.ora.min)
     event = Google::Apis::CalendarV3::Event.new({
       start: Google::Apis::CalendarV3::EventDateTime.new(date_time: start),
       end: Google::Apis::CalendarV3::EventDateTime.new(date_time: finish ),
-      summary: 'PARTITA DI CALCETTO!'
+      summary: "Partita di calcetto a #{m.campo}"
     })
     service.insert_event("primary", event)
 
@@ -675,7 +683,7 @@ class MatchesController < ApplicationController
 	#cancella partita
 	def destroy
 		@match=Match.find_by(id: params[:id])
-		authorize! :destroy, @m, :message => "Non sei autorizzato a distruggere questa partita"
+		authorize! :destroy, @match, :message => "Non sei autorizzato a distruggere questa partita"
 		@match.destroy
 		redirect_to user_matches_path current_user
 	end
